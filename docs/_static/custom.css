@@ -45,3 +45,18 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.30) transparent;
 }
+
+/* Funding logo row on the front page: lay images out side-by-side
+ * with vertical centering, breathing room between, and a small top
+ * margin so they don't crowd the Funding paragraph. */
+.funding-logos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2em;
+    margin-top: 0.75em;
+}
+
+.funding-logos img {
+    margin: 0;
+}
