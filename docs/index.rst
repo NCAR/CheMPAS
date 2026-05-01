@@ -1,6 +1,18 @@
 CheMPAS-A
 =========
 
+.. |logo_uarizona| image:: _static/logo_uarizona.svg
+   :height: 60px
+   :alt: University of Arizona
+
+.. |logo_ncar| image:: _static/logo_nsf_ncar_ucar.png
+   :height: 60px
+   :alt: NSF NCAR | UCAR
+
+.. rst-class:: funding-logos
+
+|logo_uarizona| |logo_ncar|
+
 CheMPAS-A (Chemistry for MPAS - Atmosphere) is an ACOM integration pilot that
 couples MUSICA/MICM atmospheric chemistry to MPAS-Atmosphere on its native
 unstructured Voronoi mesh, developed as part of the NSF CSSI project QUACS
@@ -9,6 +21,19 @@ Models). This is CheMPAS-A 26.04, a pre-release currently in beta testing,
 based on MPAS-Model v8.3.1.
 
 **Source:** `github.com/NCAR/CheMPAS-A <https://github.com/NCAR/CheMPAS-A>`_
+
+**Contributors:** David Fillmore (NCAR ACOM), Gabriele Pfister (NCAR ACOM),
+Avelino Arellano (University of Arizona); Mary Barth (NCAR ACOM),
+Matt Dawson (Cohere), Michael Duda (NCAR MMM), Jiwon Gim (NCAR ACOM),
+Rajesh Kumar (NCAR RAL), Forrest Lacey (NCAR RAL), Scott Meech (NCAR RAL),
+Kyle Shores (NCAR ACOM), Katherine Thayer-Calder (NCAR CGD),
+Victor Weeks (NCAR RAL).
+
+**Funding.** This work is supported by the U.S. National Science Foundation
+through the Cyberinfrastructure for Sustained Scientific Innovation (CSSI)
+program, project *QUACS: Quick Updates to Aerosol and Chemistry Systems for
+Next Generation Multi-Scale Models* (PI: Avelino Arellano, University of
+Arizona; Co-PI: Gabriele Pfister, NSF NCAR ACOM).
 
 .. note::
 
@@ -65,19 +90,6 @@ equations, and spatial discretization.
    CheMPAS-A is a downstream consumer of all three; the runtime
    species list, rate constants, and photolysis rates come from the
    MICM and TUV-x configurations loaded at startup.
-
-**Contributors:** David Fillmore (NCAR ACOM), Gabriele Pfister (NCAR ACOM),
-Avelino Arellano (University of Arizona); Mary Barth (NCAR ACOM),
-Matt Dawson (Cohere), Michael Duda (NCAR MMM), Jiwon Gim (NCAR ACOM),
-Rajesh Kumar (NCAR RAL), Forrest Lacey (NCAR RAL), Scott Meech (NCAR RAL),
-Kyle Shores (NCAR ACOM), Katherine Thayer-Calder (NCAR CGD),
-Victor Weeks (NCAR RAL).
-
-**Funding.** This work is supported by the U.S. National Science Foundation
-through the Cyberinfrastructure for Sustained Scientific Innovation (CSSI)
-program, project *QUACS: Quick Updates to Aerosol and Chemistry Systems for
-Next Generation Multi-Scale Models* (PI: Avelino Arellano, University of
-Arizona).
 
 .. toctree::
    :maxdepth: 3
