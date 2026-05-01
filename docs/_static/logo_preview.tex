@@ -1,0 +1,154 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.5in]{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+%% Sans-serif default to mirror the chempas_talk slide deck. The deck
+%% uses helvet (Helvetica) as a stand-in for the official NSF NCAR
+%% brand font, Poppins, but helvet's T1 metrics (phvr8t) are missing
+%% from minimal TeX Live installs. Latin Modern Sans is always
+%% available, similar weight/proportions, and renders identically
+%% across machines without extra packages.
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\renewcommand{\familydefault}{\sfdefault}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\fboxsep}{0pt}
+
+%% NSF NCAR palette
+\definecolor{ncarSpace}{HTML}{011837}
+\definecolor{ncarDarkBlue}{HTML}{00357A}
+\definecolor{ncarBlue}{HTML}{0A5DDA}
+\definecolor{ncarAqua}{HTML}{00A2B4}
+\definecolor{ncarLightBlue}{HTML}{CEDFF8}
+\definecolor{ncarLightGray}{HTML}{F1F0EE}
+\definecolor{ncarGray}{HTML}{58595B}
+\definecolor{ncarOrange}{HTML}{FF8C00}
+\definecolor{ncarYellow}{HTML}{FFDD31}
+\definecolor{ncarGold}{HTML}{AD8700}
+
+%% U of Arizona palette
+\definecolor{azRed}{HTML}{AB0520}
+\definecolor{azBlue}{HTML}{0C234B}
+\definecolor{azWarmGray}{HTML}{F4EDE5}
+\definecolor{azCoolGray}{HTML}{E2E9EB}
+\definecolor{azMidnight}{HTML}{001C48}
+\definecolor{azAzurite}{HTML}{1E5288}
+\definecolor{azOasis}{HTML}{378DBD}
+\definecolor{azChili}{HTML}{8B0015}
+\definecolor{azBloom}{HTML}{EF4056}
+\definecolor{azSky}{HTML}{81D3EB}
+\definecolor{azLeaf}{HTML}{70B865}
+\definecolor{azRiver}{HTML}{007D84}
+\definecolor{azMesa}{HTML}{A95C42}
+
+%% A single labeled logo cell: image stacked over a hyphenated scheme tag.
+%% \cell{stem}{label}
+\newcommand{\cell}[2]{%
+  \begin{minipage}{3.2in}\centering
+    \includegraphics[width=3.0in]{#1}\\[6pt]
+    {\ttfamily\small #2}
+  \end{minipage}%
+}
+
+%% Logo panel — fills nearly the full text width on its own page.
+%% Two scheme stems (#4, #5) drive four cells; label tags (#6, #7) are
+%% the dashed display names rendered under each logo. The macro composes
+%% "<label>, icon" labels for the icon-only row.
+%% \panel{bg}{fg}{heading}{stemA}{stemB}{labelA}{labelB}
+\newcommand{\panel}[7]{%
+  \colorbox{#1}{%
+    \begin{minipage}[t][9.5in][t]{\textwidth}
+      \color{#2}\centering\vspace{0.3in}%
+      \large\textbf{#3}\par\vspace{0.35in}
+      \cell{logo_chempas_#4}{#6}\hspace{0.3in}%
+      \cell{logo_chempas_#5}{#7}\par\vspace{0.3in}
+      \cell{logo_chempas_#4_icon}{#6, icon}\hspace{0.3in}%
+      \cell{logo_chempas_#5_icon}{#7, icon}\par\vfill
+    \end{minipage}%
+  }%
+}
+
+%% Palette swatch: \sw{bg}{fg}{hex}{name}
+\newcommand{\sw}[4]{%
+  \begin{minipage}{1.6in}
+    \colorbox{#1}{%
+      \begin{minipage}[t][0.55in][c]{1.6in}\centering\color{#2}%
+        \texttt{\small #3}\par\vspace{1pt}\footnotesize #4%
+      \end{minipage}%
+    }%
+  \end{minipage}%
+}
+
+\begin{document}
+
+%%-------------------------------------------------------------------
+%% Pages 1-3 — NCAR variants, one background per page
+%%-------------------------------------------------------------------
+\panel{white}{black}{NCAR variants on white}%
+  {ncar_blue}{ncar_aqua}{ncar-blue}{ncar-aqua}
+\newpage
+\panel{ncarLightGray}{black}{NCAR variants on ncar-light-gray (\#F1F0EE)}%
+  {ncar_blue}{ncar_aqua}{ncar-blue}{ncar-aqua}
+\newpage
+\panel{ncarGray}{white}{NCAR variants on ncar-gray (\#58595B)}%
+  {ncar_blue}{ncar_aqua}{ncar-blue}{ncar-aqua}
+\newpage
+
+%%-------------------------------------------------------------------
+%% Pages 4-6 — University of Arizona variants, one background per page
+%%-------------------------------------------------------------------
+\panel{white}{black}{University of Arizona variants on white}%
+  {arizona_blue}{arizona_red}{arizona-blue}{arizona-red}
+\newpage
+\panel{azWarmGray}{black}{University of Arizona variants on arizona-warm-gray (\#F4EDE5)}%
+  {arizona_blue}{arizona_red}{arizona-blue}{arizona-red}
+\newpage
+\panel{azCoolGray}{black}{University of Arizona variants on arizona-cool-gray (\#E2E9EB)}%
+  {arizona_blue}{arizona_red}{arizona-blue}{arizona-red}
+\newpage
+
+%%-------------------------------------------------------------------
+%% Page 7 — Brand palettes
+%%-------------------------------------------------------------------
+{\Large\textbf{Brand palettes}}\par
+\vspace{0.3in}
+
+\begin{minipage}[t]{0.48\textwidth}
+  \textbf{NSF NCAR}\par\vspace{0.18in}
+  \sw{ncarBlue}{white}{\#0A5DDA}{NCAR Blue}\hfill
+  \sw{ncarAqua}{white}{\#00A2B4}{NCAR Aqua}\par\vspace{0.1in}
+  \sw{ncarSpace}{white}{\#011837}{Space}\hfill
+  \sw{ncarDarkBlue}{white}{\#00357A}{Dark Blue}\par\vspace{0.1in}
+  \sw{ncarLightBlue}{black}{\#CEDFF8}{Light Blue}\hfill
+  \sw{ncarLightGray}{black}{\#F1F0EE}{Light Gray}\par\vspace{0.1in}
+  \sw{ncarGray}{white}{\#58595B}{Gray}\hfill
+  \sw{ncarOrange}{black}{\#FF8C00}{Orange}\par\vspace{0.1in}
+  \sw{ncarYellow}{black}{\#FFDD31}{Yellow}\hfill
+  \sw{ncarGold}{white}{\#AD8700}{Gold}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\textwidth}
+  \textbf{University of Arizona}\par\vspace{0.12in}
+  {\footnotesize\textsc{Primary}}\par\vspace{0.04in}
+  \sw{azRed}{white}{\#AB0520}{Arizona Red}\hfill
+  \sw{azBlue}{white}{\#0C234B}{Arizona Blue}\par\vspace{0.12in}
+  {\footnotesize\textsc{Neutral}}\par\vspace{0.04in}
+  \sw{white}{black}{\#FFFFFF}{White}\hfill
+  \sw{azWarmGray}{black}{\#F4EDE5}{Warm Gray}\par\vspace{0.05in}
+  \sw{azCoolGray}{black}{\#E2E9EB}{Cool Gray}\par\vspace{0.12in}
+  {\footnotesize\textsc{Complementary}}\par\vspace{0.04in}
+  \sw{azMidnight}{white}{\#001C48}{Midnight}\hfill
+  \sw{azAzurite}{white}{\#1E5288}{Azurite}\par\vspace{0.05in}
+  \sw{azOasis}{white}{\#378DBD}{Oasis}\hfill
+  \sw{azChili}{white}{\#8B0015}{Chili}\par\vspace{0.12in}
+  {\footnotesize\textsc{Highlight}}\par\vspace{0.04in}
+  \sw{azBloom}{white}{\#EF4056}{Bloom}\hfill
+  \sw{azSky}{black}{\#81D3EB}{Sky}\par\vspace{0.05in}
+  \sw{azLeaf}{white}{\#70B865}{Leaf}\hfill
+  \sw{azRiver}{white}{\#007D84}{River}\par\vspace{0.05in}
+  \sw{azMesa}{white}{\#A95C42}{Mesa}
+\end{minipage}
+
+\end{document}
