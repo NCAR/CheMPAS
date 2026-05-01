@@ -197,14 +197,28 @@ def build_svg(width=512, text_mode="chempas", color_scheme="blue"):
     deep_aqua  = "#007A8A"
     light_aqua = "#B0E8F0"
 
+    # Arizona blues (from brand.arizona.edu palette)
+    arizona_blue = "#0C234B"  # primary; face_dark + edge_dark anchor
+    azurite      = "#1E5288"  # complementary; edge_light
+    oasis        = "#378DBD"  # complementary; face_mid
+    sky          = "#81D3EB"  # highlight; face_bright
+    arizona_red  = "#AB0520"  # primary; replaces NCAR orange wordmark
+
     if color_scheme == "aqua":
         face_palette = (dark_aqua, aqua, light_aqua)
         edge_dark = dark_aqua
         edge_light = deep_aqua
+        wordmark_color = orange
+    elif color_scheme == "arizona":
+        face_palette = (arizona_blue, oasis, sky)
+        edge_dark = arizona_blue
+        edge_light = azurite
+        wordmark_color = arizona_red
     else:
         face_palette = (space, ncar_blue, light_blue)
         edge_dark = space
         edge_light = dark_blue
+        wordmark_color = orange
 
     light_dir = normalize((0.55, 0.75, 0.85))
     view_dir = (0, 0, 1)
@@ -273,12 +287,18 @@ def build_svg(width=512, text_mode="chempas", color_scheme="blue"):
     ET.SubElement(hg, "stop", offset="0%", style="stop-color:#ffffff")
     ET.SubElement(hg, "stop", offset="100%", style="stop-color:#aaaaaa")
 
-    # Oxygen: CPK red sphere (using NCAR red #D62839)
+    # Oxygen sphere — orange family for blue/aqua schemes; Arizona red
+    # family (Bloom → Chili) for the arizona scheme so the molecules sit
+    # on-palette with the wordmark.
     og = ET.SubElement(defs, "radialGradient", {
         "id": "oxygenGrad", "cx": "35%", "cy": "30%", "r": "65%",
     })
-    ET.SubElement(og, "stop", offset="0%", style="stop-color:#FFB040")
-    ET.SubElement(og, "stop", offset="100%", style="stop-color:#CC7000")
+    if color_scheme == "arizona":
+        ET.SubElement(og, "stop", offset="0%", style="stop-color:#EF4056")  # Bloom
+        ET.SubElement(og, "stop", offset="100%", style="stop-color:#8B0015")  # Chili
+    else:
+        ET.SubElement(og, "stop", offset="0%", style="stop-color:#FFB040")
+        ET.SubElement(og, "stop", offset="100%", style="stop-color:#CC7000")
 
     # Nitrogen: blue for blue theme, aqua for aqua theme
     ng = ET.SubElement(defs, "radialGradient", {
@@ -287,6 +307,9 @@ def build_svg(width=512, text_mode="chempas", color_scheme="blue"):
     if color_scheme == "aqua":
         ET.SubElement(ng, "stop", offset="0%", style="stop-color:#40D0E0")
         ET.SubElement(ng, "stop", offset="100%", style="stop-color:#005A66")
+    elif color_scheme == "arizona":
+        ET.SubElement(ng, "stop", offset="0%", style=f"stop-color:{oasis}")
+        ET.SubElement(ng, "stop", offset="100%", style=f"stop-color:{arizona_blue}")
     else:
         ET.SubElement(ng, "stop", offset="0%", style="stop-color:#4A9AFF")
         ET.SubElement(ng, "stop", offset="100%", style="stop-color:#053080")
@@ -475,7 +498,7 @@ def build_svg(width=512, text_mode="chempas", color_scheme="blue"):
             "text-anchor": "middle",
             "font-family": "Poppins, 'Helvetica Neue', Helvetica, Arial, sans-serif",
             "font-weight": "600", "font-size": "46",
-            "letter-spacing": "10", "fill": orange,
+            "letter-spacing": "10", "fill": wordmark_color,
         }).text = "CheMPAS-A"
         # Estimate text bounding box (9 chars × ~35 px per glyph + spacing)
         text_x = center_2d[0]
@@ -507,6 +530,8 @@ def main():
     write_svg(build_svg(text_mode="none"), "logo_chempas_blue_icon.svg")
     write_svg(build_svg(text_mode="chempas", color_scheme="aqua"), "logo_chempas_aqua.svg")
     write_svg(build_svg(text_mode="none", color_scheme="aqua"), "logo_chempas_aqua_icon.svg")
+    write_svg(build_svg(text_mode="chempas", color_scheme="arizona"), "logo_chempas_arizona.svg")
+    write_svg(build_svg(text_mode="none", color_scheme="arizona"), "logo_chempas_arizona_icon.svg")
 
 
 if __name__ == "__main__":
