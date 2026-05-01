@@ -24,7 +24,7 @@ based on MPAS-Model v8.3.1.
 
 **Contributors:** David Fillmore (NCAR ACOM), Gabriele Pfister (NCAR ACOM),
 Avelino Arellano (University of Arizona); Mary Barth (NCAR ACOM),
-Matt Dawson (Cohere), Michael Duda (NCAR MMM), Jiwon Gim (NCAR ACOM),
+Matt Dawson (Cohere Consulting, LLC), Michael Duda (NCAR MMM), Jiwon Gim (NCAR ACOM),
 Rajesh Kumar (NCAR RAL), Forrest Lacey (NCAR RAL), Scott Meech (NCAR RAL),
 Kyle Shores (NCAR ACOM), Katherine Thayer-Calder (NCAR CGD),
 Victor Weeks (NCAR RAL).
