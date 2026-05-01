@@ -102,3 +102,9 @@ docs/_build/
 # tracked source of truth, PNGs are rasterized on demand by
 # scripts/generate_logo_chempas.py via cairosvg.
 docs/_static/logo_chempas_*.png
+
+# Re-ignore the per-logo PDFs and the compiled preview PDF: both are
+# rebuilt by scripts/generate_logo_preview_pdf.py from the tracked
+# SVGs and the tracked logo_preview.tex source.
+docs/_static/logo_chempas_*.pdf
+docs/_static/logo_preview.pdf
