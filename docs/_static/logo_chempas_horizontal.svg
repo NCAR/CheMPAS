@@ -4,9 +4,9 @@
 <svg
    version="1.1"
    id="svg1"
-   width="2048"
+   width="2400"
    height="325"
-   viewBox="0 0 2048 325"
+   viewBox="0 0 2400 325"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
@@ -519,7 +519,7 @@
          id="tspan64"
          style="font-variant:normal;font-weight:500;font-size:218.156px;font-family:'Helvetica Neue';writing-mode:lr-tb;fill:#ff8c00;fill-opacity:1;fill-rule:nonzero;stroke:none"
          x="0"
-         dx="0 14.616468 14.616468 14.616468 14.616468 -1.5270938 11.344125"
-         y="0">CheMPAS</tspan></text>
+         dx="0 14.616468 14.616468 14.616468 14.616468 -1.5270938 11.344125 14.616468 14.616468"
+         y="0">CheMPAS-A</tspan></text>
   </g>
 </svg>
