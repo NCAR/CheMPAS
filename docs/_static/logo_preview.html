@@ -9,19 +9,19 @@
   .row { display: flex; }
   .row > div { flex: 1; padding: 24px; box-sizing: border-box; }
   .white       { background: #fff; }
-  .ncar-aqua    { background: #00A2B4; }
-  .ncar-space   { background: #011837; }
-  .arizona-blue { background: #0C234B; }
-  .warm-gray    { background: #F4EDE5; }
+  .ncar-light-gray { background: #F1F0EE; }
+  .ncar-gray       { background: #58595B; }
+  .arizona-warm-gray { background: #F4EDE5; }
+  .arizona-cool-gray { background: #E2E9EB; }
   h2 { margin: 0 0 12px; font-size: 13px; text-transform: uppercase;
        letter-spacing: 0.08em; opacity: 0.75; font-weight: 500; }
-  .ncar-aqua h2, .ncar-space h2, .arizona-blue h2 { color: #fff; }
+  .ncar-gray h2 { color: #fff; }
   .grid { display: grid; gap: 16px; }
   .grid-2 { grid-template-columns: repeat(2, 1fr); }
   .cell { text-align: center; }
   .cell img { max-width: 100%; height: 160px; }
   .cell p { margin: 8px 0 0; font-size: 12px; opacity: 0.8; font-family: monospace; }
-  .ncar-aqua .cell p, .ncar-space .cell p, .arizona-blue .cell p { color: #fff; }
+  .ncar-gray .cell p { color: #fff; }
 
   /* palette swatches */
   .palettes > .palette-pane { padding: 24px; }
@@ -99,60 +99,66 @@
 </section>
 
 <section>
-  <h1>NCAR variants — blue and aqua schemes on NCAR backgrounds</h1>
+  <h1>NCAR variants — ncar-blue and ncar-aqua schemes on NCAR backgrounds</h1>
   <div class="row">
     <div class="white">
       <h2>On white</h2>
       <div class="grid grid-2">
-        <div class="cell"><img src="logo_chempas_blue.svg" alt="">     <p>blue</p></div>
-        <div class="cell"><img src="logo_chempas_aqua.svg" alt="">     <p>aqua</p></div>
-        <div class="cell"><img src="logo_chempas_blue_icon.svg" alt=""><p>blue, icon only</p></div>
-        <div class="cell"><img src="logo_chempas_aqua_icon.svg" alt=""><p>aqua, icon only</p></div>
+        <div class="cell"><img src="logo_chempas_ncar_blue.svg" alt="">     <p>ncar-blue</p></div>
+        <div class="cell"><img src="logo_chempas_ncar_aqua.svg" alt="">     <p>ncar-aqua</p></div>
+        <div class="cell"><img src="logo_chempas_ncar_blue_icon.svg" alt=""><p>ncar-blue, icon only</p></div>
+        <div class="cell"><img src="logo_chempas_ncar_aqua_icon.svg" alt=""><p>ncar-aqua, icon only</p></div>
       </div>
     </div>
-    <div class="ncar-aqua">
-      <h2>On ncar-aqua (#00A2B4)</h2>
+    <div class="ncar-light-gray">
+      <h2>On ncar-light-gray (#F1F0EE)</h2>
       <div class="grid grid-2">
-        <div class="cell"><img src="logo_chempas_blue.svg" alt="">     <p>blue</p></div>
-        <div class="cell"><img src="logo_chempas_aqua.svg" alt="">     <p>aqua</p></div>
-        <div class="cell"><img src="logo_chempas_blue_icon.svg" alt=""><p>blue, icon only</p></div>
-        <div class="cell"><img src="logo_chempas_aqua_icon.svg" alt=""><p>aqua, icon only</p></div>
+        <div class="cell"><img src="logo_chempas_ncar_blue.svg" alt="">     <p>ncar-blue</p></div>
+        <div class="cell"><img src="logo_chempas_ncar_aqua.svg" alt="">     <p>ncar-aqua</p></div>
+        <div class="cell"><img src="logo_chempas_ncar_blue_icon.svg" alt=""><p>ncar-blue, icon only</p></div>
+        <div class="cell"><img src="logo_chempas_ncar_aqua_icon.svg" alt=""><p>ncar-aqua, icon only</p></div>
       </div>
     </div>
-    <div class="ncar-space">
-      <h2>On ncar-space (#011837)</h2>
+    <div class="ncar-gray">
+      <h2>On ncar-gray (#58595B)</h2>
       <div class="grid grid-2">
-        <div class="cell"><img src="logo_chempas_blue.svg" alt="">     <p>blue</p></div>
-        <div class="cell"><img src="logo_chempas_aqua.svg" alt="">     <p>aqua</p></div>
-        <div class="cell"><img src="logo_chempas_blue_icon.svg" alt=""><p>blue, icon only</p></div>
-        <div class="cell"><img src="logo_chempas_aqua_icon.svg" alt=""><p>aqua, icon only</p></div>
+        <div class="cell"><img src="logo_chempas_ncar_blue.svg" alt="">     <p>ncar-blue</p></div>
+        <div class="cell"><img src="logo_chempas_ncar_aqua.svg" alt="">     <p>ncar-aqua</p></div>
+        <div class="cell"><img src="logo_chempas_ncar_blue_icon.svg" alt=""><p>ncar-blue, icon only</p></div>
+        <div class="cell"><img src="logo_chempas_ncar_aqua_icon.svg" alt=""><p>ncar-aqua, icon only</p></div>
       </div>
     </div>
   </div>
 </section>
 
 <section>
-  <h1>Arizona variants — arizona scheme on U of A brand backgrounds</h1>
+  <h1>Arizona variants — arizona-blue and arizona-red schemes on U of A brand backgrounds</h1>
   <div class="row">
     <div class="white">
       <h2>On white</h2>
       <div class="grid grid-2">
-        <div class="cell"><img src="logo_chempas_arizona.svg" alt="">      <p>arizona</p></div>
-        <div class="cell"><img src="logo_chempas_arizona_icon.svg" alt=""> <p>arizona, icon only</p></div>
+        <div class="cell"><img src="logo_chempas_arizona_blue.svg" alt="">            <p>arizona-blue</p></div>
+        <div class="cell"><img src="logo_chempas_arizona_red.svg" alt="">      <p>arizona-red</p></div>
+        <div class="cell"><img src="logo_chempas_arizona_blue_icon.svg" alt="">       <p>arizona-blue, icon only</p></div>
+        <div class="cell"><img src="logo_chempas_arizona_red_icon.svg" alt=""> <p>arizona-red, icon only</p></div>
       </div>
     </div>
-    <div class="warm-gray">
+    <div class="arizona-warm-gray">
       <h2>On arizona-warm-gray (#F4EDE5)</h2>
       <div class="grid grid-2">
-        <div class="cell"><img src="logo_chempas_arizona.svg" alt="">      <p>arizona</p></div>
-        <div class="cell"><img src="logo_chempas_arizona_icon.svg" alt=""> <p>arizona, icon only</p></div>
+        <div class="cell"><img src="logo_chempas_arizona_blue.svg" alt="">            <p>arizona-blue</p></div>
+        <div class="cell"><img src="logo_chempas_arizona_red.svg" alt="">      <p>arizona-red</p></div>
+        <div class="cell"><img src="logo_chempas_arizona_blue_icon.svg" alt="">       <p>arizona-blue, icon only</p></div>
+        <div class="cell"><img src="logo_chempas_arizona_red_icon.svg" alt=""> <p>arizona-red, icon only</p></div>
       </div>
     </div>
-    <div class="arizona-blue">
-      <h2>On arizona-blue (#0C234B)</h2>
+    <div class="arizona-cool-gray">
+      <h2>On arizona-cool-gray (#E2E9EB)</h2>
       <div class="grid grid-2">
-        <div class="cell"><img src="logo_chempas_arizona.svg" alt="">      <p>arizona</p></div>
-        <div class="cell"><img src="logo_chempas_arizona_icon.svg" alt=""> <p>arizona, icon only</p></div>
+        <div class="cell"><img src="logo_chempas_arizona_blue.svg" alt="">            <p>arizona-blue</p></div>
+        <div class="cell"><img src="logo_chempas_arizona_red.svg" alt="">      <p>arizona-red</p></div>
+        <div class="cell"><img src="logo_chempas_arizona_blue_icon.svg" alt="">       <p>arizona-blue, icon only</p></div>
+        <div class="cell"><img src="logo_chempas_arizona_red_icon.svg" alt=""> <p>arizona-red, icon only</p></div>
       </div>
     </div>
   </div>
