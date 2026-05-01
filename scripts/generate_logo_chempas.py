@@ -197,28 +197,40 @@ def build_svg(width=512, text_mode="chempas", color_scheme="blue"):
     deep_aqua  = "#007A8A"
     light_aqua = "#B0E8F0"
 
-    # Arizona blues (from brand.arizona.edu palette)
-    arizona_blue = "#0C234B"  # primary; face_dark + edge_dark anchor
-    azurite      = "#1E5288"  # complementary; edge_light
-    oasis        = "#378DBD"  # complementary; face_mid
-    sky          = "#81D3EB"  # highlight; face_bright
-    arizona_red  = "#AB0520"  # primary; replaces NCAR orange wordmark
+    # Arizona palette (from brand.arizona.edu)
+    arizona_blue = "#0C234B"  # primary
+    arizona_red  = "#AB0520"  # primary
+    azurite      = "#1E5288"  # complementary
+    oasis        = "#378DBD"  # complementary
+    sky          = "#81D3EB"  # highlight
+    chili        = "#8B0015"  # complementary
+    bloom        = "#EF4056"  # highlight
+    mesa         = "#A95C42"  # highlight
 
-    if color_scheme == "aqua":
-        face_palette = (dark_aqua, aqua, light_aqua)
-        edge_dark = dark_aqua
-        edge_light = deep_aqua
-        wordmark_color = orange
-    elif color_scheme == "arizona":
-        face_palette = (arizona_blue, oasis, sky)
-        edge_dark = arizona_blue
-        edge_light = azurite
-        wordmark_color = arizona_red
-    else:
+    if color_scheme == "ncar_blue":
         face_palette = (space, ncar_blue, light_blue)
         edge_dark = space
         edge_light = dark_blue
         wordmark_color = orange
+    elif color_scheme == "ncar_aqua":
+        face_palette = (dark_aqua, aqua, light_aqua)
+        edge_dark = dark_aqua
+        edge_light = deep_aqua
+        wordmark_color = orange
+    elif color_scheme == "arizona_blue":
+        face_palette = (arizona_blue, oasis, sky)
+        edge_dark = arizona_blue
+        edge_light = azurite
+        wordmark_color = arizona_red
+    elif color_scheme == "arizona_red":
+        # All-warm hexes: Chili → Mesa → Bloom face gradient, Arizona Red
+        # rim. Wordmark stays Arizona Red across both Arizona schemes.
+        face_palette = (chili, mesa, bloom)
+        edge_dark = chili
+        edge_light = arizona_red
+        wordmark_color = arizona_red
+    else:
+        raise ValueError(f"unknown color_scheme: {color_scheme!r}")
 
     light_dir = normalize((0.55, 0.75, 0.85))
     view_dir = (0, 0, 1)
@@ -293,9 +305,9 @@ def build_svg(width=512, text_mode="chempas", color_scheme="blue"):
     og = ET.SubElement(defs, "radialGradient", {
         "id": "oxygenGrad", "cx": "35%", "cy": "30%", "r": "65%",
     })
-    if color_scheme == "arizona":
-        ET.SubElement(og, "stop", offset="0%", style="stop-color:#EF4056")  # Bloom
-        ET.SubElement(og, "stop", offset="100%", style="stop-color:#8B0015")  # Chili
+    if color_scheme in ("arizona_blue", "arizona_red"):
+        ET.SubElement(og, "stop", offset="0%", style=f"stop-color:{bloom}")
+        ET.SubElement(og, "stop", offset="100%", style=f"stop-color:{chili}")
     else:
         ET.SubElement(og, "stop", offset="0%", style="stop-color:#FFB040")
         ET.SubElement(og, "stop", offset="100%", style="stop-color:#CC7000")
@@ -304,12 +316,18 @@ def build_svg(width=512, text_mode="chempas", color_scheme="blue"):
     ng = ET.SubElement(defs, "radialGradient", {
         "id": "nitrogenGrad", "cx": "35%", "cy": "30%", "r": "65%",
     })
-    if color_scheme == "aqua":
+    if color_scheme == "ncar_aqua":
         ET.SubElement(ng, "stop", offset="0%", style="stop-color:#40D0E0")
         ET.SubElement(ng, "stop", offset="100%", style="stop-color:#005A66")
-    elif color_scheme == "arizona":
+    elif color_scheme == "arizona_blue":
         ET.SubElement(ng, "stop", offset="0%", style=f"stop-color:{oasis}")
         ET.SubElement(ng, "stop", offset="100%", style=f"stop-color:{arizona_blue}")
+    elif color_scheme == "arizona_red":
+        # Mesa → Chili so N atoms differ from O atoms (Bloom → Chili)
+        # by their highlight tone (rust-brown vs pink-red), staying inside
+        # the warm earthen family.
+        ET.SubElement(ng, "stop", offset="0%", style=f"stop-color:{mesa}")
+        ET.SubElement(ng, "stop", offset="100%", style=f"stop-color:{chili}")
     else:
         ET.SubElement(ng, "stop", offset="0%", style="stop-color:#4A9AFF")
         ET.SubElement(ng, "stop", offset="100%", style="stop-color:#053080")
@@ -526,12 +544,11 @@ def write_svg(svg, path):
 
 
 def main():
-    write_svg(build_svg(text_mode="chempas"), "logo_chempas_blue.svg")
-    write_svg(build_svg(text_mode="none"), "logo_chempas_blue_icon.svg")
-    write_svg(build_svg(text_mode="chempas", color_scheme="aqua"), "logo_chempas_aqua.svg")
-    write_svg(build_svg(text_mode="none", color_scheme="aqua"), "logo_chempas_aqua_icon.svg")
-    write_svg(build_svg(text_mode="chempas", color_scheme="arizona"), "logo_chempas_arizona.svg")
-    write_svg(build_svg(text_mode="none", color_scheme="arizona"), "logo_chempas_arizona_icon.svg")
+    for scheme in ("ncar_blue", "ncar_aqua", "arizona_blue", "arizona_red"):
+        write_svg(build_svg(text_mode="chempas", color_scheme=scheme),
+                  f"logo_chempas_{scheme}.svg")
+        write_svg(build_svg(text_mode="none", color_scheme=scheme),
+                  f"logo_chempas_{scheme}_icon.svg")
 
 
 if __name__ == "__main__":
