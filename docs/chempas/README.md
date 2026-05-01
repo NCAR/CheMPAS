@@ -1,6 +1,6 @@
 # CheMPAS-A Documentation
 
-CheMPAS-specific design notes, integration guides, plans, and results.
+CheMPAS-A-specific design notes, integration guides, plans, and results.
 The imported MPAS-Atmosphere user guide and technical-description chapters
 live one level up under `docs/users-guide/` and
 `docs/technical-description/`.

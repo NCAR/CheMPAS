@@ -29,7 +29,7 @@ Modified files:
 - `docs/tutorial/02-supercell.md` — append §§2.10 and 2.11 at chapter end (after existing §2.9).
 - `docs/tutorial/03-chapman-nox.md` — append §3.10 at chapter end (after existing §3.9).
 
-No conf.py changes. No edits to existing tutorial sections, mechanisms, or CheMPAS source.
+No conf.py changes. No edits to existing tutorial sections, mechanisms, or CheMPAS-A source.
 
 **Note on script smoke-testing.** Each implementation step ends with a build/spot-check; running the new scripts requires `musica`, `pvlib`, `ussa1976` in the conda env, which may or may not be installed. The hard acceptance gate for each task is the **clean Sphinx build** (zero new tutorial-pathed warnings) and the file existing on disk with the expected content. If the conda env has the packages, the implementer also runs each script as a sanity check; if not, that step is a no-op with a brief note in the report.
 
@@ -246,7 +246,7 @@ Full file content:
 """Standalone MUSICA-Python box model for LNOx + O3 photochemistry.
 
 Mirrors section 2.6 of the CheMPAS-A tutorial without MPAS and without
-the lightning-NOx source (which is a CheMPAS-side operator-split
+the lightning-NOx source (which is a CheMPAS-A-side operator-split
 injection in mpas_lightning_nox.F, not part of the MICM mechanism).
 Single grid cell at mid-tropospheric conditions, hardcoded
 jNO2 = 0.01 s^-1 (matches CheMPAS-A's config_lnox_j_no2), 2 h
@@ -341,7 +341,7 @@ def main() -> None:
             "T_K": T_REF,
             "P_Pa": P_REF,
             "jNO2_s-1": J_NO2,
-            "note": "Lightning-NOx source omitted (CheMPAS operator-split, not in MICM).",
+            "note": "Lightning-NOx source omitted (CheMPAS-A operator-split, not in MICM).",
         },
     )
     ds["time"].attrs["units"] = "minutes"
@@ -389,7 +389,7 @@ NO/NO2) and 50 ppb O3 background. Photolysis hardcoded as
 PHOTO.jNO2 = 0.01 s^-1, matching CheMPAS-A's config_lnox_j_no2.
 
 The lightning-NOx source is intentionally omitted — it is a
-CheMPAS operator-split injection (mpas_lightning_nox.F), not part
+CheMPAS-A operator-split injection (mpas_lightning_nox.F), not part
 of the MICM mechanism. The standalone box exercises only the
 photochemistry: NO/NO2 partitioning relaxes to Leighton PSS
 within ~1 minute, with slow O3 titration over the 2 h run.
@@ -826,7 +826,7 @@ Section content coming.
 ```
 
 The standalone counterpart of §2.6, *minus* the lightning-NOx source
-(which is a CheMPAS operator-split injection in
+(which is a CheMPAS-A operator-split injection in
 `mpas_lightning_nox.F`, not part of the MICM mechanism).
 `scripts/musica_python/lnox_box.py` loads `micm_configs/lnox_o3.yaml`
 into a single-cell MICM solver at mid-tropospheric conditions
@@ -876,7 +876,7 @@ Appends two new sections at the end of Chapter 2:
   scripts/musica_python/abba_box.py, parallels §2.5 without MPAS.
 - 2.11 Standalone LNOx + O3 box model — points at
   scripts/musica_python/lnox_box.py, parallels §2.6 without MPAS
-  and without the lightning-NOx source (which is a CheMPAS-side
+  and without the lightning-NOx source (which is a CheMPAS-A-side
   operator-split injection, not in the MICM mechanism).
 
 Both sections wear the WIP banner per the project draft-pass

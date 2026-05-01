@@ -15,7 +15,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a Python-driven numerical-regression suite for two CheMPAS cases (`chem_box`, `supercell`) that runs each case in an ephemeral run directory, compares min/max/mean of named output fields against a tracked YAML reference table, and reports PASS/FAIL per case. A `bless` flag rewrites the YAML in place (snapshot-test pattern).
+**Goal:** Build a Python-driven numerical-regression suite for two CheMPAS-A cases (`chem_box`, `supercell`) that runs each case in an ephemeral run directory, compares min/max/mean of named output fields against a tracked YAML reference table, and reports PASS/FAIL per case. A `bless` flag rewrites the YAML in place (snapshot-test pattern).
 
 **Architecture:** A small helper module (`scripts/regression_lib.py`) handles case discovery, run-dir staging (copy executable + configs, apply namelist overrides, symlink input data + MICM/TUV-x configs), `mpiexec` invocation, NetCDF stat extraction, comparison, and YAML round-trip. A thin CLI driver (`scripts/regression.py`) provides `list`, `run`, and `bless` subcommands via `argparse`. Per-case reference YAMLs live next to existing namelists at `test_cases/<case>/regression_reference.yaml`.
 
@@ -50,7 +50,7 @@ Create `scripts/regression_lib.py` with the following exact content:
 
 ```python
 """
-Helpers for the CheMPAS numerical regression suite.
+Helpers for the CheMPAS-A numerical regression suite.
 
 See docs/superpowers/specs/2026-04-19-regression-suite-design.md.
 """
@@ -334,7 +334,7 @@ Create `scripts/regression.py` with the following exact content:
 ```python
 #!/usr/bin/env python3
 """
-CheMPAS numerical regression suite — CLI entry point.
+CheMPAS-A numerical regression suite — CLI entry point.
 
 See docs/superpowers/specs/2026-04-19-regression-suite-design.md.
 Helpers live in scripts/regression_lib.py.
@@ -420,7 +420,7 @@ def cmd_bless(args: argparse.Namespace) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="regression.py",
-        description="CheMPAS numerical regression suite.")
+        description="CheMPAS-A numerical regression suite.")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("list", help="List available regression cases.")

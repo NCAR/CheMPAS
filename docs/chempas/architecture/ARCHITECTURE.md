@@ -100,7 +100,7 @@ CheMPAS-A/
 ├── Makefile                # Legacy Makefile build system
 ├── cmake/                  # CMake modules and functions
 ├── docs/                   # Sphinx documentation source
-│   ├── chempas/            # CheMPAS-specific developer notes
+│   ├── chempas/            # CheMPAS-A-specific developer notes
 │   ├── tutorial/           # CheMPAS-A tutorial chapters
 │   ├── users-guide/        # Imported MPAS-Atmosphere user's guide
 │   └── technical-description/

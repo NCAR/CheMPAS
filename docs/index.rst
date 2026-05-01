@@ -2,16 +2,16 @@ CheMPAS-A
 =========
 
 .. |logo_uarizona| image:: _static/logo_uarizona.svg
-   :height: 60px
+   :height: 78px
    :alt: University of Arizona
 
-.. |logo_ncar| image:: _static/logo_nsf_ncar_ucar.png
-   :height: 60px
+.. |logo_ncar| image:: _static/logo_nsf_ncar_ucar.svg
+   :height: 86px
    :alt: NSF NCAR | UCAR
 
 .. rst-class:: funding-logos
 
-|logo_uarizona| |logo_ncar|
+|logo_ncar| |logo_uarizona|
 
 CheMPAS-A (Chemistry for MPAS - Atmosphere) is an ACOM integration pilot that
 couples MUSICA/MICM atmospheric chemistry to MPAS-Atmosphere on its native
@@ -50,8 +50,8 @@ and idealized chemistry test cases.
 
 CheMPAS-A uses calendar versioning (YY.MM), tracked independently from the
 MPAS base model version. This documentation includes an MPAS-Atmosphere
-User's Guide adapted from the MPAS v8.3.1 release with CheMPAS-specific
-chemistry chapters and namelist entries; a CheMPAS tutorial and developer
+User's Guide adapted from the MPAS v8.3.1 release with CheMPAS-A-specific
+chemistry chapters and namelist entries; a CheMPAS-A tutorial and developer
 notes; and a lightly edited port of the MPAS-Atmosphere Technical
 Description from the v8 NCAR Technical Note draft for the dynamical core,
 equations, and spatial discretization.

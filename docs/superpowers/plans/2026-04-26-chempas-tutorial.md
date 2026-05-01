@@ -1,8 +1,8 @@
-# CheMPAS Tutorial Implementation Plan
+# CheMPAS-A Tutorial Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a new top-level **CheMPAS Tutorial** section to the Sphinx docs, scaffolded with three chapters and the supercell chapter (Chapter 2) fleshed out for both the ABBA and LNOx + O3 mechanisms. Every visible subsection wears an orange "Work in progress" banner; figures are textual placeholders.
+**Goal:** Add a new top-level **CheMPAS-A Tutorial** section to the Sphinx docs, scaffolded with three chapters and the supercell chapter (Chapter 2) fleshed out for both the ABBA and LNOx + O3 mechanisms. Every visible subsection wears an orange "Work in progress" banner; figures are textual placeholders.
 
 **Architecture:** A new `docs/tutorial/` directory parallel to `docs/users-guide/` and `docs/technical-description/`, registered in the root `docs/index.rst` toctree. Markdown chapters with a `.rst` toctree landing page, matching the existing `users-guide/` pattern so no `conf.py` changes are needed.
 
@@ -43,7 +43,7 @@ This task is structural. The supercell chapter is created with all 9 section hea
 - [ ] **Step 1.1: Create `docs/tutorial/index.rst`**
 
 ```rst
-CheMPAS Tutorial
+CheMPAS-A Tutorial
 ================
 
 A hands-on walkthrough of CheMPAS-A's idealized chemistry test cases. This
@@ -79,7 +79,7 @@ This chapter is being actively written. Commands and cross-references
 are provisional and may change.
 ```
 
-The CheMPAS Tutorial walks through CheMPAS-A's idealized chemistry test
+The CheMPAS-A Tutorial walks through CheMPAS-A's idealized chemistry test
 cases, the same cases driven by the numerical regression suite
 (`scripts/regression.py`). Where the [User's Guide](../users-guide/index.rst)
 is reference-style — a verbatim port of the upstream MPAS-Atmosphere
@@ -313,7 +313,7 @@ open -a "Google Chrome" /Users/fillmore/EarthSystem/CheMPAS-A/docs/_build/html/t
 ```
 
 Verify in the rendered page:
-- Sidebar shows **CheMPAS Tutorial** as a top-level entry between
+- Sidebar shows **CheMPAS-A Tutorial** as a top-level entry between
   **CheMPAS-A User's Guide** and **MPAS-Atmosphere Technical Description**.
 - Three child entries listed: Overview, Supercell with ABBA and LNOx,
   Chapman + NOx Photostationary State.
@@ -328,7 +328,7 @@ Verify in the rendered page:
 ```bash
 git add docs/tutorial/ docs/index.rst
 git commit -m "$(cat <<'EOF'
-docs(tutorial): scaffold CheMPAS Tutorial section
+docs(tutorial): scaffold CheMPAS-A Tutorial section
 
 New top-level docs/tutorial/ section with three chapters:
   - 01-overview.md: orientation and prerequisites (fleshed)
@@ -867,9 +867,9 @@ open -a "Google Chrome" /Users/fillmore/EarthSystem/CheMPAS-A/docs/_build/html/i
 In the rendered page, verify each item:
 
 - The root page shows three top-level sections in the sidebar:
-  CheMPAS-A User's Guide, CheMPAS Tutorial, MPAS-Atmosphere Technical
+  CheMPAS-A User's Guide, CheMPAS-A Tutorial, MPAS-Atmosphere Technical
   Description (in that order).
-- Click **CheMPAS Tutorial**. The landing page shows a page-level WIP
+- Click **CheMPAS-A Tutorial**. The landing page shows a page-level WIP
   admonition (orange) and a chapter list with three entries.
 - Click **Chapter 1: Overview**. Page renders; cross-links to
   `BUILD.md`, `RUN.md`, and the User's Guide work.

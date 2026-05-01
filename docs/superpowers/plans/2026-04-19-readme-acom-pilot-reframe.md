@@ -39,17 +39,17 @@ No other files are touched. Section ordering, voice, and link consistency are ti
 Use the Write tool to overwrite `README.md` with exactly this content:
 
 ````markdown
-CheMPAS
+CheMPAS-A
 =======
 
-CheMPAS (Chemistry for MPAS) is an ACOM integration pilot that couples
+CheMPAS-A (Chemistry for MPAS) is an ACOM integration pilot that couples
 MUSICA/MICM atmospheric chemistry to MPAS-Atmosphere on its native
 unstructured Voronoi mesh. The repository serves as a rapid-prototyping
 ground for the chemistry coupling: runtime tracer allocation, MUSICA/MICM
 state transfer, TUV-x photolysis, and idealized chemistry test cases are
 developed here ahead of any upstream integration.
 
-CheMPAS is decoupled from both
+CheMPAS-A is decoupled from both
 [MPAS-Dev/MPAS-Model](https://github.com/MPAS-Dev/MPAS-Model) and
 [NCAR/MPAS-Model-ACOM-dev](https://github.com/NCAR/MPAS-Model-ACOM-dev) —
 there is no sync or fork-tracking mechanism. Mature pieces are contributed
@@ -59,24 +59,24 @@ which is the staging ground for eventual upstream integration into
 
 ## Upstream Integration Path
 
-CheMPAS does not push its history to `MPAS-Model-ACOM-dev`. The two repos
+CheMPAS-A does not push its history to `MPAS-Model-ACOM-dev`. The two repos
 share ancestry but have no merge or rebase relationship. Integration
 contributions take the form of focused pull requests that reimplement a
-mature CheMPAS feature against the current `MPAS-Model-ACOM-dev` tree.
+mature CheMPAS-A feature against the current `MPAS-Model-ACOM-dev` tree.
 
 In practice this means each upstream PR is:
 
 - **Scoped to one capability** — e.g., runtime tracer allocation, the
   MUSICA/MICM coupler, or the TUV-x cloud radiator — rather than a bulk
-  port of CheMPAS state.
+  port of CheMPAS-A state.
 - **Re-derived against the current upstream tree**, so the diff is clean
   against `MPAS-Model-ACOM-dev`'s `Registry.xml`, build system, and module
   layout at PR time.
 - **Backed by the prototype evidence in this repo** — test cases,
   validation runs, and design notes — but not a literal port of every
-  CheMPAS file.
+  CheMPAS-A file.
 
-This separation keeps CheMPAS free to iterate quickly while keeping
+This separation keeps CheMPAS-A free to iterate quickly while keeping
 upstream PRs reviewable as standalone changes.
 
 ## What's Working
@@ -121,7 +121,7 @@ code and the relevant deeper documentation.
 
 ## Building
 
-CheMPAS builds on macOS (LLVM/flang) and Ubuntu (GCC/gfortran via conda).
+CheMPAS-A builds on macOS (LLVM/flang) and Ubuntu (GCC/gfortran via conda).
 Both paths use the same preflight script to detect the toolchain and
 export the required environment.
 
@@ -153,7 +153,7 @@ Notes:
 - `PKG_CONFIG_PATH` must be present in the same shell invocation as
   `make` — the Makefile invokes `pkg-config` at parse time.
 - Do not mix flang and gfortran `.mod` files; rebuild MUSICA-Fortran with
-  the same compiler as CheMPAS.
+  the same compiler as CheMPAS-A.
 
 See [BUILD.md](BUILD.md) for the full preflight, troubleshooting, and
 dependency-build notes, and [RUN.md](RUN.md) for executing test cases.
@@ -239,7 +239,7 @@ Expected: roughly 150–160 lines (the existing file was 87 lines; the new file 
 Run: `head -3 README.md`
 Expected output (exactly):
 ```
-CheMPAS
+CheMPAS-A
 =======
 
 ```

@@ -297,7 +297,7 @@ cleanup, grid-aware extensions, or extra validation, not blockers for Phase 2.
 - [ ] Update `Registry.xml` metadata for `config_lnox_j_no2` to describe it as
   daytime `j_max`, not a constant prescribed photolysis rate.
 - [ ] Add the analytical SZA check to the adapted `check_tuvx_phase.py`.
-  The imported gate scripts are now wired to CheMPAS defaults
+  The imported gate scripts are now wired to CheMPAS-A defaults
   (`qNO,qNO2,qO3`, `j_no2`) and include `night-jzero`, but this specific
   analytical-SZA gate is still missing.
 
@@ -507,7 +507,7 @@ are in `~/EarthSystem/TUV-x/data/`.
 
 **`src/core_atmosphere/chemistry/mpas_tuvx.F`**
 
-New module wrapping TUV-x for CheMPAS. Uses the MUSICA-level API
+New module wrapping TUV-x for CheMPAS-A. Uses the MUSICA-level API
 (`musica_tuvx`) with all atmospheric profiles from host:
 
 ```fortran
@@ -661,7 +661,7 @@ physics data:
   (currently writes a uniform scalar). Added `chemistry_set_j_no2_diag_field`.
 - [x] Extend the phase-gate scripts with `fallback-compare`,
   `transition-smooth`, and decomposition checks. The imported ancestor scripts
-  are now adapted to the CheMPAS Phase 0/1/2 matrix.
+  are now adapted to the CheMPAS-A Phase 0/1/2 matrix.
 - [x] Link flang-built `libnetcdff.a` for MUSICA's `musica_io_netcdf` module.
   Homebrew's gfortran-built `libnetcdff` uses incompatible symbol mangling
   (`___netcdf_MOD_*` vs `__QMnetcdf*`). Static archive path specified directly
@@ -1348,15 +1348,15 @@ Adapted from ancestor project (`MPAS-Model-ACOM-dev/scripts/`):
 
 | Script | Purpose |
 |--------|---------|
-| `scripts/check_tuvx_phase.py` | Imported ancestor phase-gate checker, now adapted to CheMPAS defaults (`qNO,qNO2,qO3`, `j_no2`) and extended with `fallback-compare` |
-| `scripts/run_tuvx_phase_gate.sh` | Phase wrapper adapted to the current CheMPAS Phase 0/1/2 matrix (`nonnegative`, `verify_ox_conservation.py`, `night-jzero`, `transition-smooth`, `decomp-compare`, `fallback-compare`) |
+| `scripts/check_tuvx_phase.py` | Imported ancestor phase-gate checker, now adapted to CheMPAS-A defaults (`qNO,qNO2,qO3`, `j_no2`) and extended with `fallback-compare` |
+| `scripts/run_tuvx_phase_gate.sh` | Phase wrapper adapted to the current CheMPAS-A Phase 0/1/2 matrix (`nonnegative`, `verify_ox_conservation.py`, `night-jzero`, `transition-smooth`, `decomp-compare`, `fallback-compare`) |
 
 These scripts operate on MPAS NetCDF output and exit non-zero on failure.
 Adapted for LNOx-O3 species (qNO, qNO2, qO3) rather than ancestor Chapman
 species (qO, qO2, qO3).
 
 Status note: both scripts have now been copied from the
-ancestor repo into `scripts/` and adapted to the current CheMPAS species and
+ancestor repo into `scripts/` and adapted to the current CheMPAS-A species and
 phase matrix. Remaining gaps are narrower: the analytical-SZA Phase 1 check is
 still a future enhancement rather than a Phase 2 blocker, and runtime use
 still depends on the Python `netCDF4` module plus whichever `j_*` diagnostics
@@ -1431,9 +1431,9 @@ The DAVINCI project (`~/EarthSystem/DAVINCI-MPAS/`) contains:
 - Fortran implementation sketches
 - Photolysis-to-MICM rate parameter mapping
 - `scripts/check_tuvx_phase.py` — copied into this repo from the ancestor and
-  adapted for CheMPAS species defaults and `fallback-compare`
+  adapted for CheMPAS-A species defaults and `fallback-compare`
 - `scripts/run_tuvx_phase_gate.sh` — copied into this repo from the ancestor
-  and adapted to the current CheMPAS phase matrix
+  and adapted to the current CheMPAS-A phase matrix
 
 ## Dependencies
 

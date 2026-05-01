@@ -6,7 +6,7 @@ Target file: `README.md`
 
 ## Goal
 
-Reframe the top-level `README.md` so that CheMPAS reads as an ACOM
+Reframe the top-level `README.md` so that CheMPAS-A reads as an ACOM
 integration pilot for MUSICA/MICM-in-MPAS coupling. The audience is
 MPAS / chemistry developers who may pull pieces of this work into their
 own forks or `MPAS-Model-ACOM-dev` PRs. Rapid prototyping is
@@ -14,9 +14,9 @@ emphasized; the agent-assisted development workflow is de-emphasized.
 
 ## Framing Decisions
 
-- **Pilot identity:** CheMPAS is an ACOM integration pilot for MUSICA /
+- **Pilot identity:** CheMPAS-A is an ACOM integration pilot for MUSICA /
   MICM coupling on MPAS-Atmosphere's unstructured Voronoi mesh.
-- **Repo relationship:** CheMPAS is fully decoupled from both
+- **Repo relationship:** CheMPAS-A is fully decoupled from both
   `MPAS-Dev/MPAS-Model` and `NCAR/MPAS-Model-ACOM-dev`. No sync or
   fork-tracking mechanism. Mature pieces are contributed back to
   `MPAS-Model-ACOM-dev` as deliberate, hand-crafted PRs;
@@ -36,7 +36,7 @@ emphasized; the agent-assisted development workflow is de-emphasized.
 
 ### 1. Header + opening paragraph
 
-Names CheMPAS, identifies it as an ACOM integration pilot, lists the
+Names CheMPAS-A, identifies it as an ACOM integration pilot, lists the
 representative working pieces inline (runtime tracer allocation,
 MUSICA/MICM state transfer, TUV-x photolysis, idealized chemistry test
 cases), and describes the decoupled relationship with
@@ -47,7 +47,7 @@ cases), and describes the decoupled relationship with
 
 States explicitly that there is no merge or rebase relationship with
 upstream. Describes contributions as focused pull requests that
-reimplement a mature CheMPAS feature against the current
+reimplement a mature CheMPAS-A feature against the current
 `MPAS-Model-ACOM-dev` tree. Three operational rules:
 
 - Scoped to one capability per PR.
@@ -85,7 +85,7 @@ entry point. Surfaces the two recurring footguns inline:
 
 - `PKG_CONFIG_PATH` must be present in the same shell as `make`.
 - Do not mix flang and gfortran `.mod` files; rebuild MUSICA-Fortran
-  with the same compiler as CheMPAS.
+  with the same compiler as CheMPAS-A.
 
 Lists external dependencies: MPI, NetCDF, PnetCDF, PIO, MUSICA-Fortran.
 Pushes full preflight, troubleshooting, and dependency-build notes to

@@ -1,4 +1,4 @@
-# CheMPAS Tutorial Chapter 3 — Design
+# CheMPAS-A Tutorial Chapter 3 — Design
 
 Date: 2026-04-26
 Status: Implemented
@@ -222,4 +222,4 @@ enabled).
   references.
 - This spec does not change the Sphinx theme, search index, or
   navigation behavior.
-- This spec does not edit any CheMPAS source code or scripts.
+- This spec does not edit any CheMPAS-A source code or scripts.
