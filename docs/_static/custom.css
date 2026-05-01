@@ -1,5 +1,132 @@
 /* CheMPAS-A docs — custom overrides on top of sphinx_rtd_theme. */
 
+/* ---------------------------------------------------------------------------
+ * NCAR / CheMPAS color palette (mirrors chempas_talk/main.tex).
+ * Token names match the LaTeX \definecolor names so cross-referencing
+ * the slide deck and the docs stays straightforward.
+ * ------------------------------------------------------------------------ */
+:root {
+    --ncar-space:       #011837;  /* deep navy — sidebar bg */
+    --ncar-dark-blue:   #00357A;  /* visited links, inline-code text */
+    --ncar-blue:        #0A5DDA;  /* primary brand — links, accents */
+    --ncar-aqua:        #00A2B4;  /* secondary accent — tips, seealso */
+    --ncar-light-blue:  #CEDFF8;  /* note / info backgrounds */
+    --ncar-light-gray:  #F1F0EE;  /* code bg, neutral surfaces */
+    --ncar-orange:      #FF8C00;  /* warning accent */
+    --ncar-yellow:      #FFDD31;  /* caution accent */
+    --ncar-gold:        #AD8700;  /* NSF gold (logo) */
+    --ncar-gray:        #58595B;  /* diagram / muted text */
+}
+
+/* ---------------------------------------------------------------------------
+ * Sidebar — swap RTD's default dark grey for ncarSpace, and tint the
+ * search-bar strip with ncarBlue so the brand colors anchor the chrome.
+ * ------------------------------------------------------------------------ */
+.wy-nav-side {
+    background: var(--ncar-space);
+}
+
+.wy-side-nav-search,
+.wy-nav-top {
+    background: var(--ncar-dark-blue);
+}
+
+.wy-side-nav-search input[type=text] {
+    border-color: var(--ncar-space);
+}
+
+.wy-menu-vertical a:hover {
+    background: var(--ncar-dark-blue);
+    color: #fff;
+}
+
+.wy-menu-vertical li.current > a,
+.wy-menu-vertical li.toctree-l1.current > a {
+    border-right: none;
+}
+
+.wy-menu-vertical li.current a:hover {
+    background: var(--ncar-light-blue);
+}
+
+/* ---------------------------------------------------------------------------
+ * Body links — promote ncarBlue, with ncarDarkBlue for visited so the
+ * eye reads "same family, slightly aged" rather than the default purple.
+ * ------------------------------------------------------------------------ */
+.rst-content a,
+.rst-content a code.literal {
+    color: var(--ncar-blue);
+}
+
+.rst-content a:visited {
+    color: var(--ncar-dark-blue);
+}
+
+.rst-content a:hover {
+    color: var(--ncar-aqua);
+}
+
+/* ---------------------------------------------------------------------------
+ * Inline code — neutral light-gray surface with darkBlue text replaces
+ * RTD's default red-on-pink, which clashes with the brand blues.
+ * ------------------------------------------------------------------------ */
+.rst-content code.literal,
+.rst-content tt.literal {
+    background: var(--ncar-light-gray);
+    border-color: #d6d3cf;
+    color: var(--ncar-dark-blue);
+}
+
+/* ---------------------------------------------------------------------------
+ * Admonitions — retint title bars per class so the brand vocabulary
+ * carries through. Body backgrounds stay light for readability.
+ * ------------------------------------------------------------------------ */
+.rst-content .admonition-title {
+    color: #fff;
+}
+
+.rst-content .note,
+.rst-content .seealso {
+    background: var(--ncar-light-blue);
+}
+.rst-content .note > .admonition-title {
+    background: var(--ncar-blue);
+}
+.rst-content .seealso > .admonition-title {
+    background: var(--ncar-aqua);
+}
+
+.rst-content .tip,
+.rst-content .hint,
+.rst-content .important {
+    background: #d6f1f4;  /* ncarAqua tinted toward white */
+}
+.rst-content .tip > .admonition-title,
+.rst-content .hint > .admonition-title,
+.rst-content .important > .admonition-title {
+    background: var(--ncar-aqua);
+}
+
+.rst-content .warning,
+.rst-content .caution,
+.rst-content .attention {
+    background: #fff1dc;  /* ncarOrange tinted toward white */
+}
+.rst-content .warning > .admonition-title,
+.rst-content .caution > .admonition-title,
+.rst-content .attention > .admonition-title {
+    background: var(--ncar-orange);
+}
+
+.rst-content .danger,
+.rst-content .error {
+    background: #fdecec;
+}
+.rst-content .danger > .admonition-title,
+.rst-content .error > .admonition-title {
+    background: #c0392b;
+}
+
 /* Make the left-sidebar scrollbar visible.
  *
  * sphinx_rtd_theme makes .wy-side-scroll 320px wide while the parent
