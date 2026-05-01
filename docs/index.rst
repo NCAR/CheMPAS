@@ -32,8 +32,10 @@ Victor Weeks (NCAR RAL).
 **Funding.** This work is supported by the U.S. National Science Foundation
 through the Cyberinfrastructure for Sustained Scientific Innovation (CSSI)
 program, project *QUACS: Quick Updates to Aerosol and Chemistry Systems for
-Next Generation Multi-Scale Models* (PI: Avelino Arellano, University of
-Arizona; Co-PI: Gabriele Pfister, NSF NCAR ACOM).
+Next Generation Multi-Scale Models*
+(`NSF Award #2513280 <https://www.nsf.gov/awardsearch/show-award/?AWD_ID=2513280&HistoricalAwards=false>`_;
+PI: Avelino Arellano, University of Arizona; Co-PI: Gabriele Pfister,
+NSF NCAR ACOM).
 
 .. note::
 
