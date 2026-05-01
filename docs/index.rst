@@ -3,8 +3,10 @@ CheMPAS-A
 
 CheMPAS-A (Chemistry for MPAS - Atmosphere) is an ACOM integration pilot that
 couples MUSICA/MICM atmospheric chemistry to MPAS-Atmosphere on its native
-unstructured Voronoi mesh. This is CheMPAS-A 26.04, a pre-release currently
-in beta testing, based on MPAS-Model v8.3.1.
+unstructured Voronoi mesh, developed as part of the NSF CSSI project QUACS
+(Quick Updates to Aerosol and Chemistry Systems for Next Generation Multi-Scale
+Models). This is CheMPAS-A 26.04, a pre-release currently in beta testing,
+based on MPAS-Model v8.3.1.
 
 **Source:** `github.com/NCAR/CheMPAS-A <https://github.com/NCAR/CheMPAS-A>`_
 
@@ -70,6 +72,12 @@ Matt Dawson (Cohere), Michael Duda (NCAR MMM), Jiwon Gim (NCAR ACOM),
 Rajesh Kumar (NCAR RAL), Forrest Lacey (NCAR RAL), Scott Meech (NCAR RAL),
 Kyle Shores (NCAR ACOM), Katherine Thayer-Calder (NCAR CGD),
 Victor Weeks (NCAR RAL).
+
+**Funding.** This work is supported by the U.S. National Science Foundation
+through the Cyberinfrastructure for Sustained Scientific Innovation (CSSI)
+program, project *QUACS: Quick Updates to Aerosol and Chemistry Systems for
+Next Generation Multi-Scale Models* (PI: Avelino Arellano, University of
+Arizona).
 
 .. toctree::
    :maxdepth: 3
