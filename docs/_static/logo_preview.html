@@ -1,0 +1,61 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>CheMPAS-A logo preview</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; }
+  .row { display: flex; }
+  .row > div { flex: 1; padding: 24px; box-sizing: border-box; }
+  .white { background: #fff; }
+  .aqua  { background: #00A2B4; }
+  .space { background: #011837; }
+  h2 { margin: 0 0 12px; font-size: 13px; text-transform: uppercase;
+       letter-spacing: 0.08em; opacity: 0.75; font-weight: 500; }
+  .aqua h2, .space h2 { color: #fff; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .cell { text-align: center; }
+  .cell img { max-width: 100%; height: 180px; }
+  .cell p { margin: 8px 0 0; font-size: 12px; opacity: 0.8; font-family: monospace; }
+  .aqua .cell p, .space .cell p { color: #fff; }
+  .current { font-size: 14px; padding: 16px; background: #f5f5f5; border-bottom: 1px solid #ddd; }
+</style>
+</head><body>
+
+<div class="current">
+  <strong>Current sidebar logo</strong> (from <code>conf.py: html_logo</code>):
+  <img src="logo_chempas_blue.svg" alt="" style="height: 120px; vertical-align: middle; margin-left: 12px;">
+  &nbsp; <code>logo_chempas_blue.svg</code>
+</div>
+
+<div class="row">
+  <div class="white">
+    <h2>On white</h2>
+    <div class="grid">
+      <div class="cell"><img src="logo_chempas_blue.svg" alt="">     <p>blue, with text</p></div>
+      <div class="cell"><img src="logo_chempas_aqua.svg" alt="">     <p>aqua, with text</p></div>
+      <div class="cell"><img src="logo_chempas_blue_icon.svg" alt=""><p>blue, icon only</p></div>
+      <div class="cell"><img src="logo_chempas_aqua_icon.svg" alt=""><p>aqua, icon only</p></div>
+    </div>
+  </div>
+  <div class="aqua">
+    <h2>On ncar-aqua</h2>
+    <div class="grid">
+      <div class="cell"><img src="logo_chempas_blue.svg" alt="">     <p>blue, with text</p></div>
+      <div class="cell"><img src="logo_chempas_aqua.svg" alt="">     <p>aqua, with text</p></div>
+      <div class="cell"><img src="logo_chempas_blue_icon.svg" alt=""><p>blue, icon only</p></div>
+      <div class="cell"><img src="logo_chempas_aqua_icon.svg" alt=""><p>aqua, icon only</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="space" style="flex: 2">
+    <h2>On ncar-space</h2>
+    <div class="grid" style="grid-template-columns: repeat(4, 1fr)">
+      <div class="cell"><img src="logo_chempas_blue.svg" alt="">     <p>blue, with text</p></div>
+      <div class="cell"><img src="logo_chempas_aqua.svg" alt="">     <p>aqua, with text</p></div>
+      <div class="cell"><img src="logo_chempas_blue_icon.svg" alt=""><p>blue, icon only</p></div>
+      <div class="cell"><img src="logo_chempas_aqua_icon.svg" alt=""><p>aqua, icon only</p></div>
+    </div>
+  </div>
+</div>
+
+</body></html>
