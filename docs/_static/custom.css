@@ -19,16 +19,14 @@
 }
 
 /* ---------------------------------------------------------------------------
- * Sidebar — swap RTD's default dark grey for ncarSpace, and tint the
- * search-bar strip with ncarBlue so the brand colors anchor the chrome.
+ * Sidebar — NCAR aqua for the nav, with the search-bar strip dropped to
+ * ncarSpace so the brand color anchors the chrome and gives a clear
+ * header/body split.
  * ------------------------------------------------------------------------ */
-.wy-nav-side {
-    background: var(--ncar-space);
-}
-
+.wy-nav-side,
 .wy-side-nav-search,
 .wy-nav-top {
-    background: var(--ncar-dark-blue);
+    background: var(--ncar-aqua);
 }
 
 .wy-side-nav-search input[type=text] {

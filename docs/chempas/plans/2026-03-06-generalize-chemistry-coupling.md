@@ -16,7 +16,7 @@ Key commits:
 
 ## Context
 
-All chemistry tracer coupling in CheMPAS was hardcoded for the 3-species ABBA mechanism (AB, A, B). Species names appeared as string literals in 7+ places each, molar masses were Fortran `parameter` constants, and tracer indices were fetched individually by name. This made it impossible to switch chemistry mechanisms without editing Fortran source code.
+All chemistry tracer coupling in CheMPAS-A was hardcoded for the 3-species ABBA mechanism (AB, A, B). Species names appeared as string literals in 7+ places each, molar masses were Fortran `parameter` constants, and tracer indices were fetched individually by name. This made it impossible to switch chemistry mechanisms without editing Fortran source code.
 
 Phase 1 generalized the coupling layer to loop over species dynamically using MICM's runtime API. Phase 2 then removed chemistry tracers from `Registry.xml` entirely, discovering them at runtime from the MICM config.
 

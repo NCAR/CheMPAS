@@ -11,7 +11,7 @@ Target files (new):
 
 ## Goal
 
-A numerical-regression suite for CheMPAS that runs short variants of
+A numerical-regression suite for CheMPAS-A that runs short variants of
 `chem_box` and `supercell` against a tracked YAML reference table and
 reports PASS/FAIL per case. Each case is set up in an ephemeral run
 directory under `/tmp/chempas_regression/<case>/`, with input data

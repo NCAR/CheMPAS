@@ -162,7 +162,7 @@ from the `j_*` diagnostic fields in `output.nc` at t=5 min):
 ```
 
 `jO2` is effectively zero everywhere except the MPAS top, as expected
-(Schumann-Runge bands attenuated out). This is the **first** CheMPAS
+(Schumann-Runge bands attenuated out). This is the **first** CheMPAS-A
 run that has O2 photolysis in the mechanism; prior runs had `jNO2`
 only via `lnox_o3.yaml`.
 
@@ -198,7 +198,7 @@ t=24h: O3_max = 6.995e-06 mol/m³              O_max = 6.3e-8
 
 Stratopause O3 stays pinned at a physical ~15 ppm over 24 h. **No
 explosion.** So the bug is NOT in MICM's Chapman mechanism itself —
-it is specific to the CheMPAS + MUSICA coupling.
+it is specific to the CheMPAS-A + MUSICA coupling.
 
 ## The smoking gun: step-1 photolysis rates
 
@@ -637,7 +637,7 @@ running the next test:
 So following the handoff literally requires a cross-repo MUSICA
 API addition (new C shim for `state.relative_tolerance_` and
 BE param setters, matching Fortran bindings, rebuild MUSICA-LLVM,
-rebuild CheMPAS). Deferring that; trying option 4 first —
+rebuild CheMPAS-A). Deferring that; trying option 4 first —
 pre-dawn start — since it targets the same root cause
 (degenerate implicit-solve neighborhood at full-strength
 photolysis) with only a namelist edit.
@@ -963,7 +963,7 @@ here), Newton/Rosenbrock converge to it.
 ### 2026-04-19 correction: standalone column tests do not reproduce
 
 The late-evening conclusion above was too strong. Two standalone
-MUSICA column-model tests were run on macOS, outside the CheMPAS
+MUSICA column-model tests were run on macOS, outside the CheMPAS-A
 coupler, to check whether daylight cold start + Chapman stiffness is
 enough to reproduce the chem_box explosion.
 
@@ -987,7 +987,7 @@ time_hr   O3_mean      O3_max       O_max        surface jO3(3P)
 24.000    1.228e-06    6.995e-06    1.180e-07    4.815e-04
 ```
 
-**Test 2 — CheMPAS `chapman_nox.yaml` in the standalone column
+**Test 2 — CheMPAS-A `chapman_nox.yaml` in the standalone column
 model.** Temporary column-model main loaded
 `../v1/chapman_nox.yaml`, mapped TUV v5.4 photolysis channels into
 `PHOTO.jO2`, `PHOTO.jO3_O`, `PHOTO.jO3_O1D`, and `PHOTO.jNO2`,
@@ -1027,12 +1027,12 @@ daylight cadence.
 
 ### Revised conclusion
 
-The remaining suspect is CheMPAS-specific coupling or host-state
+The remaining suspect is CheMPAS-A-specific coupling or host-state
 construction, not the raw MICM mechanism:
 
 - MPAS → MICM concentration conversion or grid-cell ordering
-- CheMPAS `state%rate_parameters` assignment
-- CheMPAS TUV from-host profile path (`mpas_tuvx.F`) versus the
+- CheMPAS-A `state%rate_parameters` assignment
+- CheMPAS-A TUV from-host profile path (`mpas_tuvx.F`) versus the
   standalone TUV v5.4 profile setup
 - MPAS density, pressure, temperature, or vertical-coordinate inputs
 - A mismatch between chem_box layer ordering and TUV/MICM column
@@ -1078,7 +1078,7 @@ after : O3 = 1.05000692e-06, O = 5.66545016e-15, NO = 5.94930308e-10, NO2 = 1.36
 O-atom and N-atom totals were conserved. A second standalone run
 cloned the same exact state over 3,840 MICM cells (matching the
 64-cell × 60-level chem_box count) and used the same MICM stride
-formulae as the CheMPAS coupler:
+formulae as the CheMPAS-A coupler:
 
 ```
 after: O3 mean/range = 1.05000692e-06 / 1.05000692e-06 .. 1.05000692e-06
@@ -1094,24 +1094,24 @@ The temporary files were:
 - `/tmp/micm_exact_run/configs/v1/chapman_nox.yaml`
 
 This rules out MICM behavior for the logged surface cell and rules
-out a generic vector-size/stride failure for a CheMPAS-sized MICM
+out a generic vector-size/stride failure for a CheMPAS-A-sized MICM
 state. The chem_box explosion must depend on some part of the full
-CheMPAS host state that the single-cell exact replay did not cover:
+CheMPAS-A host state that the single-cell exact replay did not cover:
 another level/cell, a whole-column layout/profile issue, a
-post-solve CheMPAS copy-back issue, or a difference in how the
-CheMPAS driver calls/logs the solve.
+post-solve CheMPAS-A copy-back issue, or a difference in how the
+CheMPAS-A driver calls/logs the solve.
 
 Next discriminator: dump the full 3,840-cell MICM state immediately
-before the first CheMPAS `micm%solve` call (conditions,
+before the first CheMPAS-A `micm%solve` call (conditions,
 concentrations, and rate parameters), replay that exact state in a
 standalone program, and compare the full-state post-solve values
-against CheMPAS before any MPAS copy-back.
+against CheMPAS-A before any MPAS copy-back.
 
 ### 2026-04-19 full-state replay: MICM reproduces the failure
 
 The full-state discriminator above was run with temporary
 rank-qualified dump instrumentation around the first coupled
-`micm%solve` call in `mpas_musica.F`. Because CheMPAS is MPI
+`micm%solve` call in `mpas_musica.F`. Because CheMPAS-A is MPI
 decomposed, each rank owns a local MICM state:
 
 ```
@@ -1129,7 +1129,7 @@ A standalone replay driver loaded each rank's dumped conditions,
 concentrations, and rate parameters into a fresh MICM state, ran the
 same 3 s `RosenbrockStandardOrder` solve at `relative_tolerance =
 1e-15`, and wrote its post-solve state. The replayed concentration
-arrays matched the CheMPAS post-solve dumps bit-for-bit on every
+arrays matched the CheMPAS-A post-solve dumps bit-for-bit on every
 rank (`max_abs_diff = 0` for all ranks).
 
 All ranks reproduce the explosion outside MPAS:
@@ -1146,7 +1146,7 @@ rank  cells  O3_mean before  O3_mean after  O3_max after
 7     2520   2.871e-06       9.507e-02      3.150e-01
 ```
 
-This rules out MPAS copy-back and CheMPAS-specific solve-call
+This rules out MPAS copy-back and CheMPAS-A-specific solve-call
 plumbing. The exact state handed to MICM is sufficient to reproduce
 the first-step failure in a standalone program.
 
@@ -1198,7 +1198,7 @@ The one-cell level-2 reproducer is now tracked:
 - `test_cases/chem_box/reproducers/run_chapman_nox_level2_reproducer.sh`
 
 It exposed the actual issue: the failure is not a physical
-level-2 MICM instability. It is a CheMPAS rate-parameter storage-order
+level-2 MICM instability. It is a CheMPAS-A rate-parameter storage-order
 mismatch.
 
 For `chapman_nox.yaml`, `state%rate_parameters_ordering%name(i)` and
@@ -1328,7 +1328,7 @@ Coupled chem_box verification with the rebuilt executable:
 - `SetRelativeTolerance` API in MUSICA-LLVM (generally useful for
   other stiff chemistry, not specifically for Chapman).
 - `config_micm_relative_tolerance` and `config_chem_substeps`
-  namelist plumbing in CheMPAS.
+  namelist plumbing in CheMPAS-A.
 - `scripts/init_chapman.py --qo-mode {qss,uniform,zero}` with
   altitude-dependent QSS [O] seeding as the default.
 - Solver default in `mpas_musica.F` flipped to

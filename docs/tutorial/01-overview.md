@@ -7,7 +7,7 @@ This chapter is being actively written. Commands and cross-references
 are provisional and may change.
 ```
 
-The CheMPAS Tutorial walks through CheMPAS-A's idealized chemistry test
+The CheMPAS-A Tutorial walks through CheMPAS-A's idealized chemistry test
 cases. Where the [User's Guide](../users-guide/index.rst)
 is reference-style — a verbatim port of the upstream MPAS-Atmosphere
 documentation — this tutorial is narrative: run the case, look at the

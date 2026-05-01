@@ -406,10 +406,10 @@ with `time` in minutes and species in mol m⁻³) and `abba_box.png`
 
 The mechanism declares three gas-phase species (`A`, `B`, `AB`) and
 a single `gas` phase that lists them. Each species declaration
-carries CheMPAS extension fields under `__`-prefixed keys
+carries CheMPAS-A extension fields under `__`-prefixed keys
 (`do advect`, `absolute tolerance`, `molar mass`,
 `initial concentration`); these are non-standard and are read by the
-CheMPAS chemistry coupler to wire each species into MPAS's tracer
+CheMPAS-A chemistry coupler to wire each species into MPAS's tracer
 transport.
 
 The two reactions are both `USER_DEFINED`: AB → A + B with
@@ -431,7 +431,7 @@ This section is being revised.
 ```
 
 The standalone counterpart of §2.6, *minus* the lightning-NOx source
-(which is a CheMPAS operator-split injection in
+(which is a CheMPAS-A operator-split injection in
 `mpas_lightning_nox.F`, not part of the MICM mechanism).
 `scripts/musica_python/lnox_box.py` loads `micm_configs/lnox_o3.yaml`
 into a single-cell MICM solver at mid-tropospheric conditions

@@ -1,5 +1,5 @@
-CheMPAS Tutorial
-================
+CheMPAS-A Tutorial
+==================
 
 A hands-on walkthrough of CheMPAS-A's idealized chemistry test cases. This
 tutorial complements the imported MPAS-Atmosphere User's Guide (which is a

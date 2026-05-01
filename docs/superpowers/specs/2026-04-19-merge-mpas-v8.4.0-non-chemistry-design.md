@@ -6,32 +6,32 @@ Target branch: `merge-mpas-v8.4.0-non-chemistry` (new feature branch off `develo
 
 ## Goal
 
-Pull in v8.4.0's non-chemistry changes from `MPAS-Dev/MPAS-Model` into CheMPAS, deferring all chemistry-touching files to a separate later effort. Work happens on a feature branch; final integration via `--no-ff` merge into `develop` only after macOS build + supercell smoke + Ubuntu build all pass.
+Pull in v8.4.0's non-chemistry changes from `MPAS-Dev/MPAS-Model` into CheMPAS-A, deferring all chemistry-touching files to a separate later effort. Work happens on a feature branch; final integration via `--no-ff` merge into `develop` only after macOS build + supercell smoke + Ubuntu build all pass.
 
 ## Scope
 
 **In scope (~78 files):**
-- 53 v8.4.0 files with no CheMPAS modifications — clean adds/applies
+- 53 v8.4.0 files with no CheMPAS-A modifications — clean adds/applies
 - ~25 v8.4.0 files in the intersection that don't touch chemistry (framework/, dynamics/ except chemistry-adjacent, init_atmosphere/, physics/ except chemistry-adjacent, core_test/, external/, build infrastructure)
 
 **Explicitly out of scope (deferred to a separate chemistry-strategy brainstorm):**
 - `src/core_atmosphere/Registry.xml` (chemistry namelist conflicts)
 - `src/core_atmosphere/mpas_atm_core.F` (chemistry init/step calls)
 - `src/core_atmosphere/Makefile` (chemistry/MUSICA build wiring)
-- `src/core_atmosphere/chemistry/Makefile` (CheMPAS-side; v8.4.0 added its own)
-- `src/core_atmosphere/chemistry/mpas_atm_chemistry.F` (CheMPAS 1039 lines vs v8.4.0's 128-line stub)
+- `src/core_atmosphere/chemistry/Makefile` (CheMPAS-A-side; v8.4.0 added its own)
+- `src/core_atmosphere/chemistry/mpas_atm_chemistry.F` (CheMPAS-A 1039 lines vs v8.4.0's 128-line stub)
 - `src/core_atmosphere/chemistry/musica/Makefile` (same situation)
-- `src/core_atmosphere/chemistry/musica/mpas_musica.F` (CheMPAS 1036 lines vs v8.4.0's 181-line stub)
+- `src/core_atmosphere/chemistry/musica/mpas_musica.F` (CheMPAS-A 1036 lines vs v8.4.0's 181-line stub)
 
-These 7 files require the chemistry-strategy decision (CheMPAS adopts upstream's chemistry interface? upstream adopts CheMPAS's? coexist?) which is its own brainstorm.
+These 7 files require the chemistry-strategy decision (CheMPAS-A adopts upstream's chemistry interface? upstream adopts CheMPAS-A's? coexist?) which is its own brainstorm.
 
 ## Pre-existing Context
 
 - v8.3.1 → v8.4.0 changeset: 236 commits; 81 files changed (71 modified, 10 added, 0 deleted); +8276/-1812 lines.
-- CheMPAS-modified files vs v8.3.1: 29.
-- Intersection (CheMPAS-modified ∩ v8.4.0-modified): 28 files. Of these, 3 are chemistry-adjacent (deferred); 25 are in scope.
-- v8.4.0-only files: 53 (no CheMPAS conflict).
-- See `docs/upstream/2026-04-19-vs-mpas-v8.3.1.md` for the CheMPAS-vs-v8.3.1 baseline comparison.
+- CheMPAS-A-modified files vs v8.3.1: 29.
+- Intersection (CheMPAS-A-modified ∩ v8.4.0-modified): 28 files. Of these, 3 are chemistry-adjacent (deferred); 25 are in scope.
+- v8.4.0-only files: 53 (no CheMPAS-A conflict).
+- See `docs/upstream/2026-04-19-vs-mpas-v8.3.1.md` for the CheMPAS-A-vs-v8.3.1 baseline comparison.
 
 ## File Categorization
 
@@ -49,21 +49,21 @@ These 7 files require the chemistry-strategy decision (CheMPAS adopts upstream's
 | `src/driver/` | 1 — `Makefile` | 0 | 1 |
 | Top-level + `cmake/` | 3 — `Makefile`, `README.md`, `cmake/Functions/MPAS_Functions.cmake` | 2 — `Makefile`, `cmake/Modules/FindPnetCDF.cmake` | 5 |
 
-\* `mpas_halo_interface.inc` is a v8.4.0 *addition*, but CheMPAS already has its own version of the same file (independently created to fix the macOS LLVM/flang build — see project memory `project_halo_interface_macos_fix.md`). Convergent evolution; needs explicit reconciliation.
+\* `mpas_halo_interface.inc` is a v8.4.0 *addition*, but CheMPAS-A already has its own version of the same file (independently created to fix the macOS LLVM/flang build — see project memory `project_halo_interface_macos_fix.md`). Convergent evolution; needs explicit reconciliation.
 
-† `mpas_dmpar.F` carries the CheMPAS-side `inlist` `pointer` → `intent(in)` fix (per the v8.3.1 comparison doc). Default-to-upstream MUST re-apply this fix.
+† `mpas_dmpar.F` carries the CheMPAS-A-side `inlist` `pointer` → `intent(in)` fix (per the v8.3.1 comparison doc). Default-to-upstream MUST re-apply this fix.
 
-‡ `mpas_atm_time_integration.F`, `mpas_atmphys_todynamics.F`, `mpas_atm_halos.F` carry the CheMPAS-side halo refactor (Mac build fix). When defaulting to upstream, verify the macOS build still works — if upstream's `mpas_halo_interface.inc` isn't sufficient on its own, additional CheMPAS-side adjustments may need to be re-applied.
+‡ `mpas_atm_time_integration.F`, `mpas_atmphys_todynamics.F`, `mpas_atm_halos.F` carry the CheMPAS-A-side halo refactor (Mac build fix). When defaulting to upstream, verify the macOS build still works — if upstream's `mpas_halo_interface.inc` isn't sufficient on its own, additional CheMPAS-A-side adjustments may need to be re-applied.
 
 ## Conflict-Resolution Policy
 
 **Default**: take v8.4.0's version of each in-scope file.
 
-**Re-apply intentional CheMPAS fixes**:
+**Re-apply intentional CheMPAS-A fixes**:
 - `mpas_dmpar.F`: re-apply `inlist` `pointer` → `intent(in)` change.
-- Halo files (3 above + the new `mpas_halo_interface.inc`): test macOS build first; if it breaks, treat halo subsystem as a sub-merge requiring per-line reconciliation between CheMPAS and v8.4.0 solutions.
+- Halo files (3 above + the new `mpas_halo_interface.inc`): test macOS build first; if it breaks, treat halo subsystem as a sub-merge requiring per-line reconciliation between CheMPAS-A and v8.4.0 solutions.
 
-If additional intentional CheMPAS-side fixes surface during the merge (i.e., a file's CheMPAS modification turns out to be a deliberate fix rather than incidental), preserve it and document in the relevant commit message.
+If additional intentional CheMPAS-A-side fixes surface during the merge (i.e., a file's CheMPAS-A modification turns out to be a deliberate fix rather than incidental), preserve it and document in the relevant commit message.
 
 ## Merge Mechanism (kept flexible)
 
@@ -85,7 +85,7 @@ for f in src/core_atmosphere/Registry.xml \
          src/core_atmosphere/chemistry/mpas_atm_chemistry.F \
          src/core_atmosphere/chemistry/musica/Makefile \
          src/core_atmosphere/chemistry/musica/mpas_musica.F; do
-    git checkout HEAD -- "$f"   # keep CheMPAS-side version
+    git checkout HEAD -- "$f"   # keep CheMPAS-A-side version
 done
 
 # Resolve remaining intersection-file conflicts per Conflict-Resolution Policy.
@@ -134,7 +134,7 @@ Inside `merge-mpas-v8.4.0-non-chemistry`, group changes by area for bisect-frien
    - mpas_atm_halos.F (intersection, in core_atmosphere)
    - mpas_atm_time_integration.F (intersection, in dynamics)
    - mpas_atmphys_todynamics.F (intersection, in physics)
-   - mpas_halo_interface.inc (CheMPAS already has; reconcile with v8.4.0's
+   - mpas_halo_interface.inc (CheMPAS-A already has; reconcile with v8.4.0's
      newly added version)
    - **macOS build verification gate before this commit lands**
 
@@ -212,14 +212,14 @@ The final `--no-ff` merge into `develop` uses subject `Merge branch 'merge-mpas-
 
 ## Risks and Mitigations
 
-- **macOS build breaks after halo reconciliation** → commit 2 has its own validation gate; abort and fall back to keeping CheMPAS's halo refactor unchanged if upstream's `mpas_halo_interface.inc` doesn't compile with flang.
+- **macOS build breaks after halo reconciliation** → commit 2 has its own validation gate; abort and fall back to keeping CheMPAS-A's halo refactor unchanged if upstream's `mpas_halo_interface.inc` doesn't compile with flang.
 - **Build works but supercell run regresses** → only chemistry-untouched files in scope, so a regression points to a build-system issue or framework change with side effects on output. Diff `output.nc` against the `d7601e4` / `fee5a28` baseline; bisect by commit-on-branch.
 - **Ubuntu fails after macOS passes** → most likely a `gfortran`-vs-`flang` divergence in something v8.4.0 changed; treat as a separate fix, not a merge revert.
 - **`mpas_dmpar.F` `intent(in)` fix gets lost** → spec calls this out explicitly in the categorization table; commit 1 message lists it as a re-application.
 
 ## Deferred / Out of Scope
 
-- Chemistry-strategy decision (CheMPAS chemistry vs upstream stub) — separate brainstorm
+- Chemistry-strategy decision (CheMPAS-A chemistry vs upstream stub) — separate brainstorm
 - The 7 chemistry-touching files (Registry.xml, mpas_atm_core.F, core_atmosphere/Makefile, all chemistry/* files)
 - Forward merges from v8.4.0 → v8.5.0 / v9.0.0 — establish the upstream remote and merge mechanism here so future merges are routine
 - Cross-platform `init_atmosphere_model` build (the spec only validates `atmosphere_model`; the init binary likely also needs a separate verify, deferred to plan-time)

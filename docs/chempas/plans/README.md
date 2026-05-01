@@ -2,7 +2,7 @@
 
 Use this directory for detailed implementation plans and execution logs.
 These files are historical working records as well as planning aids; prefer
-the User's Guide, Tutorial, and CheMPAS integration guides for current user
+the User's Guide, Tutorial, and CheMPAS-A integration guides for current user
 instructions.
 
 ## Canonical Structure

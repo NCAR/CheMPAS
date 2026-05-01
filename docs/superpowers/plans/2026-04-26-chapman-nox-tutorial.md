@@ -1,4 +1,4 @@
-# CheMPAS Tutorial Chapter 3 (Chapman + NOx) Implementation Plan
+# CheMPAS-A Tutorial Chapter 3 (Chapman + NOx) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -909,7 +909,7 @@ In the rendered page, verify:
 - The cross-links in sections 3.3 and 3.9 (to TUVX_INTEGRATION.md,
   MUSICA_INTEGRATION.md, and the root index) all resolve when
   clicked.
-- Sidebar: **CheMPAS Tutorial** still has three child entries; the
+- Sidebar: **CheMPAS-A Tutorial** still has three child entries; the
   Chapman + NOx page is now substantive (no longer a `[To be added.]`
   stub page).
 

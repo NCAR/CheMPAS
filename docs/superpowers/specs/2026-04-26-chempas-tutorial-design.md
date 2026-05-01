@@ -1,4 +1,4 @@
-# CheMPAS Tutorial Section — Design
+# CheMPAS-A Tutorial Section — Design
 
 Date: 2026-04-26
 Status: Implemented
@@ -14,7 +14,7 @@ Target files (modified):
 
 ## Goal
 
-Add a new top-level **CheMPAS Tutorial** section to the Sphinx docs that
+Add a new top-level **CheMPAS-A Tutorial** section to the Sphinx docs that
 walks readers hands-on through CheMPAS-A's idealized chemistry test cases.
 This pass scaffolds the full tutorial structure and fleshes out the first
 chapter — the supercell test case run with both the ABBA and LNOx + O3
@@ -100,7 +100,7 @@ the dynamical-core reference material.)
 
 Page-level WIP banner at the top. Then short prose covering:
 
-- What the CheMPAS Tutorial is (a hands-on walkthrough of CheMPAS-A's
+- What the CheMPAS-A Tutorial is (a hands-on walkthrough of CheMPAS-A's
   idealized chemistry cases, complementary to the verbatim-upstream
   User's Guide).
 - What this tutorial assumes the reader has done already:
@@ -198,7 +198,7 @@ cd docs && make html
 ```
 
 No new Sphinx warnings beyond those already present on `develop`.
-`docs/_build/html/index.html` should show **CheMPAS Tutorial** as
+`docs/_build/html/index.html` should show **CheMPAS-A Tutorial** as
 a top-level section in the sidebar with three child entries
 (Overview, Supercell with ABBA and LNOx, Chapman + NOx
 Photostationary State).

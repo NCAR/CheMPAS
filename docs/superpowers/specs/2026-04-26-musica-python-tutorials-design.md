@@ -145,7 +145,7 @@ Key design points:
   `state.get_user_defined_rate_parameters()['PHOTO.jNO2'] = [0.01]`
   once and leaves it constant for the whole run.
 - **Lightning source intentionally absent:** the docstring explicitly
-  notes that the lightning-NOx source is a CheMPAS operator-split
+  notes that the lightning-NOx source is a CheMPAS-A operator-split
   injection (in `mpas_lightning_nox.F`), not part of the MICM
   mechanism, and is therefore not part of the standalone box model.
 - **Time loop:** same pattern as `abba_box.py`, 60-s output cadence,
@@ -257,7 +257,7 @@ install musica`); run command; figure placeholder (Figure 2.5);
 
 Appended after §2.10. WIP banner; framing as the standalone
 counterpart of §2.6 *minus the lightning-NOx source* (which is
-CheMPAS's operator-split injection, not in the MICM mechanism);
+CheMPAS-A's operator-split injection, not in the MICM mechanism);
 mention of the hardcoded `jNO2 = 0.01 s⁻¹` matching
 `config_lnox_j_no2`; run command; figure placeholder (Figure 2.6);
 "what to look for" closing pointing at PSS relaxation and slow

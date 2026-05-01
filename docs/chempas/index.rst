@@ -1,7 +1,7 @@
 CheMPAS-A Developer Notes
 =========================
 
-CheMPAS-specific architecture notes, integration guides, implementation
+CheMPAS-A-specific architecture notes, integration guides, implementation
 plans, validation results, and upstream-comparison notes.
 
 .. toctree::
