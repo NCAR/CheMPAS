@@ -217,6 +217,14 @@ documented in tutorial §§2.10 / 2.11 / 3.10):
 - `ussa1976` — US Standard Atmosphere 1976 T/p profiles.
 - `ephem` — solar position from latitude / longitude / UTC time.
 
+Branding-asset extras (`scripts/generate_logo_chempas.py` writes a 2048-px
+PNG companion next to each SVG when cairosvg is available; the script
+falls back to SVG-only without it):
+
+```bash
+~/miniconda3/envs/mpas/bin/pip install cairosvg
+```
+
 ### Visualization Scripts (`scripts/`)
 
 | Script | Purpose |

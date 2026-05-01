@@ -97,3 +97,8 @@ docs/_build/
 !docs/_static/**/*.png
 !docs/_static/**/*.pdf
 !docs/_static/**/*.svg
+
+# Re-ignore the generated CheMPAS-A logo PNG companions: SVG is the
+# tracked source of truth, PNGs are rasterized on demand by
+# scripts/generate_logo_chempas.py via cairosvg.
+docs/_static/logo_chempas_*.png
