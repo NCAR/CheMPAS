@@ -17,6 +17,16 @@ Color palette from NSF NCAR brand guidelines:
 import math
 import xml.etree.ElementTree as ET
 
+try:
+    import cairosvg
+except ImportError:
+    cairosvg = None
+
+# Pixel width for the rasterized PNG companion. 2048 px covers print
+# (6.8" at 300 DPI), poster (13.6" at 150 DPI), and web (21" at 96 DPI)
+# from a single source — downsize as needed; never upscale.
+PNG_WIDTH_PX = 2048
+
 
 # ---------------------------------------------------------------------------
 # Vector math
@@ -541,9 +551,16 @@ def write_svg(svg, path):
     ET.indent(tree, space="  ")
     tree.write(path, encoding="unicode", xml_declaration=True)
     print(f"Wrote {path}")
+    if cairosvg is not None:
+        png_path = path.removesuffix(".svg") + ".png"
+        cairosvg.svg2png(url=path, write_to=png_path,
+                         output_width=PNG_WIDTH_PX)
+        print(f"Wrote {png_path} ({PNG_WIDTH_PX}px wide)")
 
 
 def main():
+    if cairosvg is None:
+        print("note: cairosvg not installed — SVG only, skipping PNG output")
     for scheme in ("ncar_blue", "ncar_aqua", "arizona_blue", "arizona_red"):
         write_svg(build_svg(text_mode="chempas", color_scheme=scheme),
                   f"logo_chempas_{scheme}.svg")
