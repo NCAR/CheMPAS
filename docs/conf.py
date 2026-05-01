@@ -65,7 +65,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'CheMPAS-A'
-copyright = u'Copyright (c) 2013-2020,  Los Alamos National Security, LLC (LANS) (Ocean: LA-CC-13-047;' \
+copyright = u'Copyright (c) 2013-2026,  Los Alamos National Security, LLC (LANS) (Ocean: LA-CC-13-047;' \
             u'Land Ice: LA-CC-13-117) and the University Corporation for Atmospheric Research (UCAR).'
 author = u'Xylar Asay-Davis, Doug Jacobsen, Michael Duda, Mark Petersen, ' \
          u'Matt Hoffman, Adridan Turner, Philip Wolfram'

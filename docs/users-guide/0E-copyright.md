@@ -4,7 +4,7 @@ The MPAS-specific source code developed under this project has been copyrighted 
 
 ---
 
-Copyright (c) 2013-2019, Los Alamos National Security, LLC (LANS) (LA-CC-13-047) and the University Corporation for Atmospheric Research (UCAR).
+Copyright (c) 2013-2026, Los Alamos National Security, LLC (LANS) (LA-CC-13-047) and the University Corporation for Atmospheric Research (UCAR).
 
 All rights reserved.
 
