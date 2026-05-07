@@ -21,6 +21,7 @@ from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.tri import Triangulation
 from netCDF4 import Dataset
 
@@ -38,6 +39,23 @@ M_NO = 0.030
 M_NO2 = 0.046
 M_O3 = 0.048
 M_AIR = 0.029
+
+# Custom colormap: a pure-white plateau at the bottom followed by the
+# gnuplot_r ramp (yellow → orange → red → purple → black, warm rainbow).
+# The (white_plateau, 'white') stop holds the cmap at pure white through
+# the first 10% of its range so the lowest contourf interval renders as
+# flat white (matplotlib paints each fill at the midpoint of an interval,
+# so for a typical 8-bin scale the lowest fill lands inside the plateau).
+def _white_plus_gnuplot_r(name, white_plateau=0.10, n_samples=32):
+    src = plt.cm.gnuplot_r
+    stops = [(0.0, 'white'), (white_plateau, 'white')]
+    for f in np.linspace(0.0, 1.0, n_samples):
+        pos = white_plateau + (1.0 - white_plateau) * f
+        stops.append((pos, src(f)))
+    return LinearSegmentedColormap.from_list(name, stops)
+
+NOX_CMAP = _white_plus_gnuplot_r('white_gnuplot_r')
+JNO2_CMAP = NOX_CMAP  # same scheme for j_NO2
 
 
 # ---------------------------------------------------------------------------
@@ -351,16 +369,16 @@ def plot_vertical_cross_section(data, time_idx, output_file, y_slice=None,
     ax.set_title(style.format_title('(a) O3 anomaly'))
     ax.set_ylabel('Height (km)')
 
-    # (b) NO in ppbv — own scale (so the colormap is fully used)
+    # (b) NO in ppbv — own scale; cyan→blue→purple with pure-white base
     ax = axes[0, 1]
-    draw_panel(ax, no_slice, no_levels, 'ncar_sunset',
+    draw_panel(ax, no_slice, no_levels, NOX_CMAP,
                label='ppbv', extend='max')
     overlay_wind(ax)
     ax.set_title('(b) NO')
 
-    # (c) NO2 in ppbv — own scale (so the colormap is fully used)
+    # (c) NO2 in ppbv — own scale, same NOx cmap family for direct comparison
     ax = axes[1, 0]
-    draw_panel(ax, no2_slice, no2_levels, 'ncar_sunset',
+    draw_panel(ax, no2_slice, no2_levels, NOX_CMAP,
                label='ppbv', extend='max')
     overlay_wind(ax)
     ax.set_title(style.format_title('(c) NO2'))
@@ -373,7 +391,7 @@ def plot_vertical_cross_section(data, time_idx, output_file, y_slice=None,
         j_slice = data['j_no2'][time_idx, selected, :] * 1.0e3   # s^-1 -> 10^-3 s^-1
         j_max = max(j_slice.max(), 1e-6)
         j_levels = nice_levels(0.0, j_max)
-        draw_panel(ax, j_slice, j_levels, 'ncar_sunset',
+        draw_panel(ax, j_slice, j_levels, JNO2_CMAP,
                    label='10^-3 s^-1', extend='max')
         ax.set_title(style.format_title('(d) j_NO2'))
     else:
