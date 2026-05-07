@@ -516,8 +516,36 @@ module mpas_atm_chemistry
         call mpas_pool_get_array(state, 'scalars', scalars, time_lev)
         call mpas_pool_get_array(state, 'w', w, time_lev)
         call mpas_pool_get_array(mesh, 'zgrid', zgrid)
+        call mpas_pool_get_array(state, 'theta_m', theta_m, time_lev)
+        call mpas_pool_get_array(diag, 'exner', exner)
+        call mpas_pool_get_dimension(state, 'index_qv', index_qv)
+
         if (associated(scalars) .and. associated(w) .and. associated(zgrid)) then
-            call lightning_nox_inject(dt, scalars, w, zgrid, nVertLevels, nCells, time_lev)
+            if (associated(theta_m) .and. associated(exner) .and. &
+                associated(index_qv)) then
+                ! Compute T = theta_m / (1 + rvord * qv) * exner.
+                ! Same formula used by chemistry_from_MPAS / chemistry_to_MPAS.
+                block
+                    real(kind=RKIND), allocatable :: temperature(:,:)
+                    integer :: kk, ii
+                    allocate(temperature(nVertLevels, nCells))
+                    do ii = 1, nCells
+                        do kk = 1, nVertLevels
+                            temperature(kk, ii) = (theta_m(kk, ii) / &
+                                (1.0_RKIND + rvord * scalars(index_qv, kk, ii))) &
+                                * exner(kk, ii)
+                        end do
+                    end do
+                    call lightning_nox_inject(dt, scalars, w, zgrid, &
+                                              nVertLevels, nCells, time_lev, &
+                                              temperature=temperature)
+                    deallocate(temperature)
+                end block
+            else
+                ! Temperature inputs unavailable — call without T (altitude mode safe).
+                call lightning_nox_inject(dt, scalars, w, zgrid, &
+                                          nVertLevels, nCells, time_lev)
+            end if
         end if
 
         ! Step 1: Copy MPAS state to MICM (MPAS -> MICM)
