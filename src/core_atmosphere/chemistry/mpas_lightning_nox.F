@@ -40,12 +40,19 @@ module mpas_lightning_nox
     logical, save :: lnox_active = .false.
     integer, save :: idx_qNO = -1
 
+    ! Gating mode constants
+    integer, parameter :: MODE_ALTITUDE = 1
+    integer, parameter :: MODE_ISOTHERM = 2
+    integer, save :: mode = MODE_ALTITUDE
+
     ! Parameters (set from namelist at init)
-    real(kind=RKIND), save :: source_rate_ppbv = 0.0_RKIND   ! rate [ppbv/s] when (w - w_threshold) = w_ref
-    real(kind=RKIND), save :: w_threshold      = 5.0_RKIND   ! [m/s]
-    real(kind=RKIND), save :: w_ref            = 10.0_RKIND  ! excess updraft scale [m/s]
-    real(kind=RKIND), save :: z_min            = 5000.0_RKIND ! [m]
-    real(kind=RKIND), save :: z_max            = 12000.0_RKIND ! [m]
+    real(kind=RKIND), save :: source_rate_ppbv = 0.0_RKIND   ! rate [ppbv/s] when (w - w_threshold) = w_ref (altitude mode); constant rate [ppbv/s] in isotherm mode
+    real(kind=RKIND), save :: w_threshold      = 5.0_RKIND   ! [m/s] (used as hard on/off gate in both modes)
+    real(kind=RKIND), save :: w_ref            = 10.0_RKIND  ! excess updraft scale [m/s] (altitude mode only)
+    real(kind=RKIND), save :: z_min            = 5000.0_RKIND ! [m] (altitude mode only)
+    real(kind=RKIND), save :: z_max            = 12000.0_RKIND ! [m] (altitude mode only)
+    real(kind=RKIND), save :: t_min            = 233.15_RKIND ! [K] cold isotherm (isotherm mode only)
+    real(kind=RKIND), save :: t_max            = 262.15_RKIND ! [K] warm isotherm (isotherm mode only)
 
     ! Constants for unit conversion (ppbv -> kg/kg mass mixing ratio)
     real(kind=RKIND), parameter :: M_NO  = 0.030_RKIND   ! kg/mol (NO molar mass)
@@ -109,6 +116,35 @@ contains
         call mpas_pool_get_config(configs, 'config_lnox_z_max', cfg_ptr)
         if (associated(cfg_ptr)) z_max = cfg_ptr
 
+        ! Read isotherm-mode bounds
+        nullify(cfg_ptr)
+        call mpas_pool_get_config(configs, 'config_lnox_t_min', cfg_ptr)
+        if (associated(cfg_ptr)) t_min = cfg_ptr
+
+        nullify(cfg_ptr)
+        call mpas_pool_get_config(configs, 'config_lnox_t_max', cfg_ptr)
+        if (associated(cfg_ptr)) t_max = cfg_ptr
+
+        ! Read gating mode (string -> integer flag)
+        block
+            character(len=StrKIND), pointer :: mode_str
+            nullify(mode_str)
+            call mpas_pool_get_config(configs, 'config_lnox_gating_mode', mode_str)
+            if (associated(mode_str)) then
+                select case (trim(adjustl(mode_str)))
+                case ('altitude')
+                    mode = MODE_ALTITUDE
+                case ('isotherm')
+                    mode = MODE_ISOTHERM
+                case default
+                    call mpas_log_write('[LNOx] Unknown config_lnox_gating_mode "' &
+                        // trim(adjustl(mode_str)) // '"; lightning source disabled.')
+                    lnox_active = .false.
+                    return
+                end select
+            end if
+        end block
+
         if (source_rate_ppbv <= 0.0_RKIND) then
             call mpas_log_write('[LNOx] source_rate <= 0; lightning source disabled.')
             lnox_active = .false.
@@ -121,15 +157,31 @@ contains
             return
         end if
 
+        ! Mode-specific validation
+        if (mode == MODE_ISOTHERM) then
+            if (t_min <= 0.0_RKIND .or. t_max <= 0.0_RKIND .or. t_min >= t_max) then
+                call mpas_log_write('[LNOx] Invalid isotherm bounds (require 0 < t_min < t_max); lightning source disabled.')
+                lnox_active = .false.
+                return
+            end if
+        end if
+
         lnox_active = .true.
 
         call mpas_log_write('[LNOx] Lightning NOx source enabled:')
         call mpas_log_write('[LNOx]   qNO index    = $i', intArgs=(/idx_qNO/))
         call mpas_log_write('[LNOx]   source_rate  = $r ppbv/s', realArgs=(/source_rate_ppbv/))
         call mpas_log_write('[LNOx]   w_threshold  = $r m/s', realArgs=(/w_threshold/))
-        call mpas_log_write('[LNOx]   w_ref        = $r m/s', realArgs=(/w_ref/))
-        call mpas_log_write('[LNOx]   z_min        = $r m', realArgs=(/z_min/))
-        call mpas_log_write('[LNOx]   z_max        = $r m', realArgs=(/z_max/))
+        if (mode == MODE_ALTITUDE) then
+            call mpas_log_write('[LNOx]   gating_mode  = altitude')
+            call mpas_log_write('[LNOx]   w_ref        = $r m/s', realArgs=(/w_ref/))
+            call mpas_log_write('[LNOx]   z_min        = $r m', realArgs=(/z_min/))
+            call mpas_log_write('[LNOx]   z_max        = $r m', realArgs=(/z_max/))
+        else
+            call mpas_log_write('[LNOx]   gating_mode  = isotherm')
+            call mpas_log_write('[LNOx]   t_min        = $r K (cold)', realArgs=(/t_min/))
+            call mpas_log_write('[LNOx]   t_max        = $r K (warm)', realArgs=(/t_max/))
+        end if
 
     end subroutine lightning_nox_init
 
