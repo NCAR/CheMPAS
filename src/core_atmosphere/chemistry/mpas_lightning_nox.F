@@ -199,7 +199,8 @@ contains
     !>  w interpolated to layer midpoints from interface values.
     !-----------------------------------------------------------------------
     subroutine lightning_nox_inject(dt, scalars, w, zgrid, &
-                                    nVertLevels, nCells, time_lev)
+                                    nVertLevels, nCells, time_lev, &
+                                    temperature)
 
         use mpas_log, only: mpas_log_write
 
@@ -210,6 +211,7 @@ contains
         integer, intent(in) :: nVertLevels
         integer, intent(in) :: nCells
         integer, intent(in) :: time_lev
+        real(kind=RKIND), intent(in), optional :: temperature(:,:)  ! (nVertLevels, nCells); required for isotherm mode
 
         integer :: iCell, k, n_activated
         real(kind=RKIND) :: w_mid, z_mid, delta_q
@@ -217,33 +219,60 @@ contains
 
         if (.not. lnox_active) return
 
+        if (mode == MODE_ISOTHERM .and. .not. present(temperature)) then
+            call mpas_log_write('[LNOx] Isotherm mode requires temperature; skipping injection this step.')
+            return
+        end if
+
         n_activated = 0
 
-        do iCell = 1, nCells
-            do k = 1, nVertLevels
+        if (mode == MODE_ALTITUDE) then
+            do iCell = 1, nCells
+                do k = 1, nVertLevels
 
-                ! Layer-midpoint vertical velocity (average of interfaces)
-                w_mid = 0.5_RKIND * (w(k, iCell) + w(k+1, iCell))
+                    ! Layer-midpoint vertical velocity (average of interfaces)
+                    w_mid = 0.5_RKIND * (w(k, iCell) + w(k+1, iCell))
 
-                ! Layer-midpoint height
-                z_mid = 0.5_RKIND * (zgrid(k, iCell) + zgrid(k+1, iCell))
+                    ! Layer-midpoint height
+                    z_mid = 0.5_RKIND * (zgrid(k, iCell) + zgrid(k+1, iCell))
 
-                if (w_mid > w_threshold .and. &
-                    z_mid >= z_min .and. z_mid <= z_max) then
+                    if (w_mid > w_threshold .and. &
+                        z_mid >= z_min .and. z_mid <= z_max) then
 
-                    ! Source in mass mixing ratio [kg/kg]:
-                    !   rate [ppbv/s] * scale * dt * 1e-9 * (M_NO / M_AIR)
-                    ! The 1e-9 converts ppbv to mole fraction; M_NO/M_AIR
-                    ! converts volume mixing ratio to mass mixing ratio.
-                    delta_q = source_rate_ppbv * (w_mid - w_threshold) / w_ref &
-                              * dt * 1.0e-9_RKIND * (M_NO / M_AIR)
+                        ! Source in mass mixing ratio [kg/kg]:
+                        !   rate [ppbv/s] * scale * dt * 1e-9 * (M_NO / M_AIR)
+                        ! The 1e-9 converts ppbv to mole fraction; M_NO/M_AIR
+                        ! converts volume mixing ratio to mass mixing ratio.
+                        delta_q = source_rate_ppbv * (w_mid - w_threshold) / w_ref &
+                                  * dt * 1.0e-9_RKIND * (M_NO / M_AIR)
 
-                    scalars(idx_qNO, k, iCell) = scalars(idx_qNO, k, iCell) + delta_q
-                    n_activated = n_activated + 1
-                end if
+                        scalars(idx_qNO, k, iCell) = scalars(idx_qNO, k, iCell) + delta_q
+                        n_activated = n_activated + 1
+                    end if
 
+                end do
             end do
-        end do
+        else  ! MODE_ISOTHERM
+            do iCell = 1, nCells
+                do k = 1, nVertLevels
+
+                    w_mid = 0.5_RKIND * (w(k, iCell) + w(k+1, iCell))
+
+                    if (w_mid > w_threshold .and. &
+                        temperature(k, iCell) >= t_min .and. &
+                        temperature(k, iCell) <= t_max) then
+
+                        ! Constant source (LNOx.md formulation): no w-scaling.
+                        delta_q = source_rate_ppbv &
+                                  * dt * 1.0e-9_RKIND * (M_NO / M_AIR)
+
+                        scalars(idx_qNO, k, iCell) = scalars(idx_qNO, k, iCell) + delta_q
+                        n_activated = n_activated + 1
+                    end if
+
+                end do
+            end do
+        end if
 
         if (first_call) then
             call mpas_log_write('[LNOx] First injection: $i cell-levels activated', &
