@@ -822,9 +822,18 @@ def main():
     # Aggregate-style plots (evolution, horizontal, source, photolysis) run once.
     if args.every_min is not None and args.every_min > 0:
         tm = data['time_minutes']
-        targets = np.arange(0.0, tm[-1] + 1e-6, args.every_min)
-        snapshot_indices = [int(np.argmin(np.abs(tm - t))) for t in targets]
-        # Deduplicate while preserving order (close cadences can repeat)
+        # Targets: multiples of every_min that fall inside the available
+        # snapshot range. For each, pick the first snapshot at-or-after the
+        # target so that labels approach round-number ticks even when the
+        # output cadence doesn't divide every_min cleanly.
+        first_target = np.ceil(tm[0] / args.every_min) * args.every_min
+        targets = np.arange(first_target, tm[-1] + 1e-6, args.every_min)
+        snapshot_indices = []
+        for t in targets:
+            after = np.where(tm >= t)[0]
+            if len(after) > 0:
+                snapshot_indices.append(int(after[0]))
+        # Deduplicate while preserving order
         seen = set()
         snapshot_indices = [i for i in snapshot_indices
                             if not (i in seen or seen.add(i))]
