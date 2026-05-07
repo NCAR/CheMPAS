@@ -88,6 +88,23 @@
 !     config_chemistry_longitude = -97.93
 ! /
 !
+! LNOx tropospheric development setup (isotherm gating, LNOx.md formulation):
+! &musica
+!     config_micm_file = 'lnox_o3.yaml'
+!     config_tuvx_config_file = 'tuvx_no2.json'
+!     config_tuvx_top_extension = .true.
+!     config_tuvx_extension_file = 'tuvx_upper_atm.csv'
+!     config_lnox_gating_mode = 'isotherm'
+!     config_lnox_source_rate = 1.0e-3
+!     config_lnox_w_threshold = 5.0
+!     config_lnox_t_min = 233.15
+!     config_lnox_t_max = 262.15
+!     config_lnox_j_no2 = 0.01
+!     config_lnox_nox_tau = 0.0
+!     config_chemistry_latitude = 35.86
+!     config_chemistry_longitude = -97.93
+! /
+!
 ! Chapman stratospheric-ozone setup (requires AFGL O3 profile via
 ! scripts/init_chapman.py before running):
 ! &musica
