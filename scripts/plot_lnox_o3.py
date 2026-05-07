@@ -87,6 +87,32 @@ def smart_levels(data_min, data_max, n=51):
     return np.linspace(lo, hi, n)
 
 
+def nice_levels(vmin, vmax, target_n=10):
+    """Contour levels at clean round values, ~target_n of them.
+
+    Picks step sizes from {1, 2, 5} × 10^k so labels are 0.1, 0.2, 0.5,
+    1, 2, 5, 10, … rather than 0.0584, 0.1167, … Levels span from
+    floor(vmin/step)*step to ceil(vmax/step)*step.
+    """
+    span = vmax - vmin
+    if span < 1e-12:
+        return np.array([vmin, vmax])
+    raw_step = span / target_n
+    mag = 10.0 ** np.floor(np.log10(raw_step))
+    norm = raw_step / mag
+    if norm < 1.5:
+        step = 1.0 * mag
+    elif norm < 3.5:
+        step = 2.0 * mag
+    elif norm < 7.5:
+        step = 5.0 * mag
+    else:
+        step = 10.0 * mag
+    lo = np.floor(vmin / step) * step
+    hi = np.ceil(vmax / step) * step
+    return np.arange(lo, hi + step / 2, step)
+
+
 def load_data(filename):
     """Load MPAS output data for lightning NOx analysis."""
     ds = Dataset(filename, 'r')
@@ -135,8 +161,12 @@ def load_data(filename):
     if 'uReconstructZonal' in ds.variables:
         data['uZonal'] = ds['uReconstructZonal'][:]
         data['uMeridional'] = ds['uReconstructMeridional'][:]
-    if 'j_no2' in ds.variables:
-        data['j_no2'] = ds['j_no2'][:]              # (Time, nCells, nVertLevels)
+    # MPAS writes TUV-x rates with a 'j_' prefix and the reaction name as
+    # the suffix. Accept either historical 'j_no2' or the current 'j_jNO2'.
+    if 'j_jNO2' in ds.variables:
+        data['j_no2'] = ds['j_jNO2'][:]             # (Time, nCells, nVertLevels)
+    elif 'j_no2' in ds.variables:
+        data['j_no2'] = ds['j_no2'][:]
     ds.close()
     return data
 
@@ -212,8 +242,18 @@ def find_updraft_y(data, time_idx):
 def plot_vertical_cross_section(data, time_idx, output_file, y_slice=None,
                                  dt_seconds=60.0, w_threshold=0.3,
                                  w_ref=10.0, z_min_m=1000.0, z_max_m=12000.0,
-                                 source_rate_ppbv=0.1):
-    """4-panel vertical cross-section: NO, NO2, O3, NO2/(NO+NO2)."""
+                                 source_rate_ppbv=0.1,
+                                 nox_vmin=0.0, no_vmax=None, no2_vmax=None,
+                                 o3_anom_max=None,
+                                 no_fill=False):
+    """4-panel vertical cross-section: O3, NO, NO2, NO2/(NO+NO2).
+
+    Optional shared-scaling parameters for cross-snapshot comparability:
+      nox_vmax     : ppbv ceiling for NO and NO2 panels (auto if None)
+      o3_anom_max  : symmetric ppbv range around background for O3 anomaly
+                     panel (auto if None)
+      no_fill      : if True, draw contour lines only (no contourf fills)
+    """
     if y_slice is None:
         y_slice = find_updraft_y(data, time_idx)
 
@@ -255,66 +295,93 @@ def plot_vertical_cross_section(data, time_idx, output_file, y_slice=None,
                       color='0.2', alpha=0.5, scale=600,
                       width=0.0025, headwidth=3.5, headlength=4, zorder=3)
 
-    # Compute source field on the cross-section
-    z_center_m = z * 1000  # km -> m
-    w_xsec = data['w'][time_idx, selected, :] if 'w' in data else None
+    def draw_panel(ax, field, levels, cmap, label, *, extend='neither'):
+        """Render a panel: filled contour (or lines-only if no_fill).
 
-    # Compute all slices first for shared scaling
+        Colorbar ticks are pinned to the contour levels so labels are
+        the round numbers from nice_levels().
+        """
+        if not no_fill:
+            cf = ax.contourf(X, Z, field.T, levels=levels, cmap=cmap,
+                             extend=extend)
+            rasterize_contours(cf)
+            cb = add_colorbar(cf, ax, label=label)
+        else:
+            cl = ax.contour(X, Z, field.T, levels=levels, cmap=cmap,
+                            linewidths=1.0, extend=extend)
+            cb = add_colorbar(cl, ax, label=label)
+        cb.set_ticks(levels)
+        return cb
+
+    # Compute slices
     o3_slice = to_ppbv(data['qO3'][time_idx, selected, :], M_O3)
     no_slice = to_ppbv(data['qNO'][time_idx, selected, :], M_NO)
     no2_slice = to_ppbv(data['qNO2'][time_idx, selected, :], M_NO2)
 
-    # Use a shared NOx scale so NO and NO2 are visually comparable
-    nox_vmax = max(no_slice.max(), no2_slice.max(), 1.0)
-    nox_levels = smart_levels(0, nox_vmax)
+    # Per-species NO/NO2 scaling so each panel uses the full colormap range.
+    # NO peak ~ 5x NO2 peak in lightning sources, so a shared scale wastes
+    # the NO2 colormap. Cross-snapshot comparability is preserved by the
+    # caller passing the snapshot-set max for each species.
+    if no_vmax is None:
+        no_vmax = max(no_slice.max(), 1e-6)
+    if no2_vmax is None:
+        no2_vmax = max(no2_slice.max(), 1e-6)
+    no_levels = nice_levels(nox_vmin, no_vmax)
+    no2_levels = nice_levels(nox_vmin, no2_vmax)
+
+    # O3 ANOMALY view: O3 - background. With background ~50 ppbv and only
+    # tens-of-ppbv loss in the source region, plotting absolute O3 wastes
+    # 99% of the dynamic range on saturated background colour. The anomaly
+    # makes the chemical loss legible and uses a diverging cmap centered
+    # at zero.
+    o3_background = float(np.median(o3_slice))
+    o3_anom = o3_slice - o3_background
+    if o3_anom_max is None:
+        o3_anom_max = max(abs(o3_anom).max(), 1e-6)
+    o3_levels = nice_levels(-o3_anom_max, o3_anom_max)
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
-    # (a) O3 in ppbv — anchor at field min/max so the LNOx-driven loss
-    # near background is visible. With background ~50 ppbv and a few-ppbv
-    # loss in the source region, anchoring at 0 hides all the structure.
+    # (a) O3 anomaly (ppbv from background median)
     ax = axes[0, 0]
-    o3_levels = smart_levels(o3_slice.min(), o3_slice.max())
-    cf = ax.contourf(X, Z, o3_slice.T, levels=o3_levels, cmap='ncar_sunset')
-    rasterize_contours(cf)
-    add_colorbar(cf, ax, label='ppbv')
+    draw_panel(ax, o3_anom, o3_levels, 'RdBu',
+               label=f'Δ O3 (ppbv from {o3_background:.1f})',
+               extend='both')
     overlay_wind(ax)
-    ax.set_title(style.format_title('(a) O3'))
+    ax.set_title(style.format_title('(a) O3 anomaly'))
     ax.set_ylabel('Height (km)')
 
-    # (b) NO in ppbv — same scale as NO2
+    # (b) NO in ppbv — own scale (so the colormap is fully used)
     ax = axes[0, 1]
-    cf = ax.contourf(X, Z, no_slice.T, levels=nox_levels, cmap='ncar_sunset',
-                     extend='max')
-    rasterize_contours(cf)
-    add_colorbar(cf, ax, label='ppbv')
+    draw_panel(ax, no_slice, no_levels, 'ncar_sunset',
+               label='ppbv', extend='max')
     overlay_wind(ax)
     ax.set_title('(b) NO')
 
-    # (c) NO2 in ppbv — same scale as NO
+    # (c) NO2 in ppbv — own scale (so the colormap is fully used)
     ax = axes[1, 0]
-    cf = ax.contourf(X, Z, no2_slice.T, levels=nox_levels, cmap='ncar_sunset',
-                     extend='max')
-    rasterize_contours(cf)
-    add_colorbar(cf, ax, label='ppbv')
+    draw_panel(ax, no2_slice, no2_levels, 'ncar_sunset',
+               label='ppbv', extend='max')
     overlay_wind(ax)
     ax.set_title(style.format_title('(c) NO2'))
-    ax.set_xlabel('X (km)')
+    ax.set_xlabel('x (km)')
     ax.set_ylabel('Height (km)')
 
-    # (d) NO2/(NO+NO2) ratio
+    # (d) j_NO2 photolysis rate (TUV-x) in 10^-3 s^-1
     ax = axes[1, 1]
-    nox_slice = no_slice + no2_slice
-    with np.errstate(divide='ignore', invalid='ignore'):
-        ratio = np.where(nox_slice > 0.1, no2_slice / nox_slice, np.nan)
-    cf = ax.contourf(X, Z, ratio.T, levels=np.linspace(0, 1, 21),
-                     cmap='coolwarm')
-    rasterize_contours(cf)
-    cb = add_colorbar(cf, ax, label='fraction')
-    cb.ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.1f}'))
+    if 'j_no2' in data:
+        j_slice = data['j_no2'][time_idx, selected, :] * 1.0e3   # s^-1 -> 10^-3 s^-1
+        j_max = max(j_slice.max(), 1e-6)
+        j_levels = nice_levels(0.0, j_max)
+        draw_panel(ax, j_slice, j_levels, 'ncar_sunset',
+                   label='10^-3 s^-1', extend='max')
+        ax.set_title(style.format_title('(d) j_NO2'))
+    else:
+        ax.text(0.5, 0.5, 'j_NO2 not in output',
+                ha='center', va='center', transform=ax.transAxes)
+        ax.set_title(style.format_title('(d) j_NO2 (missing)'))
     overlay_wind(ax)
-    ax.set_title(style.format_title('(d) NO2 / NOx'))
-    ax.set_xlabel('X (km)')
+    ax.set_xlabel('x (km)')
 
     plt.suptitle(style.format_title(
         f'Lightning NOx Cross-Section at y = {y_slice:.0f} km, t = {t_min:.0f} min'),
@@ -421,7 +488,7 @@ def plot_horizontal_evolution(data, level, output_file, n_times=6,
         cf = ax.tricontourf(tri, vals, levels=shared_levels, cmap='ncar_sunset',
                             vmin=0, vmax=vmax, extend='max')
         rasterize_contours(cf)
-        ax.set_xlabel('X (km)')
+        ax.set_xlabel('x (km)')
         ax.set_ylabel('Y (km)')
         ax.set_aspect('equal')
         if wind:
@@ -475,7 +542,7 @@ def plot_species_comparison(data, level, time_idx, output_file,
     if wind:
         add_wind_barbs(ax, data, time_idx, level)
     ax.set_title('NO')
-    ax.set_xlabel('X (km)')
+    ax.set_xlabel('x (km)')
     ax.set_ylabel('Y (km)')
     ax.set_aspect('equal')
 
@@ -488,7 +555,7 @@ def plot_species_comparison(data, level, time_idx, output_file,
     if wind:
         add_wind_barbs(ax, data, time_idx, level)
     ax.set_title(style.species_label('NO2'))
-    ax.set_xlabel('X (km)')
+    ax.set_xlabel('x (km)')
     ax.set_aspect('equal')
 
     # NO source
@@ -510,7 +577,7 @@ def plot_species_comparison(data, level, time_idx, output_file,
     if wind:
         add_wind_barbs(ax, data, time_idx, level)
     ax.set_title('NO source')
-    ax.set_xlabel('X (km)')
+    ax.set_xlabel('x (km)')
     ax.set_aspect('equal')
 
     plt.suptitle(style.format_title(
@@ -718,7 +785,7 @@ def plot_photolysis(data, output_file, dt_seconds=60.0):
     cf = ax.contourf(X, Z, j_slice.T, levels=j_levels, cmap='magma')
     rasterize_contours(cf)
     add_colorbar(cf, ax, label=r'$\times 10^{-3}$ s$^{-1}$')
-    ax.set_xlabel('X (km)')
+    ax.set_xlabel('x (km)')
     ax.set_ylabel('Height (km)')
     t_label = data['time_minutes'][time_idx]
     ax.set_title(style.format_title(
@@ -773,6 +840,21 @@ def main():
                         help='j_NO2 photolysis rate time series and cross-section')
     parser.add_argument('--wind', action='store_true',
                         help='Overlay wind barbs on horizontal plots')
+    parser.add_argument('--no-fill', action='store_true',
+                        help='Vertical cross-sections: draw contour lines only, '
+                             'no filled contours. Output gets a _lines suffix.')
+    parser.add_argument('--nox-vmin', type=float, default=0.0,
+                        help='Common floor for NO and NO2 panels in ppbv (default 0). '
+                             'Use a small positive value (e.g. 0.05) to suppress trace haze.')
+    parser.add_argument('--no-vmax', type=float, default=None,
+                        help='NO panel ceiling in ppbv (default: max NO across '
+                             'selected snapshots, so colormap is fully used).')
+    parser.add_argument('--no2-vmax', type=float, default=None,
+                        help='NO2 panel ceiling in ppbv (default: max NO2 across '
+                             'selected snapshots; independent of NO scale).')
+    parser.add_argument('--o3-vmax', type=float, default=None,
+                        help='O3 anomaly panel symmetric range in ppbv (default: '
+                             'auto from max |anomaly| across selected snapshots).')
     parser.add_argument('--w-threshold', type=float, default=0.3,
                         help='w threshold for source mask (default: 0.3 m/s)')
     parser.add_argument('--w-ref', type=float, default=10.0,
@@ -849,14 +931,51 @@ def main():
 
     if args.vertical or args.all:
         print("Generating vertical cross-section...")
+        # Pre-compute per-species color scales across the selected snapshots
+        # so each panel fills its colormap (NO and NO2 differ by ~5x in
+        # peak magnitude — sharing a scale wastes most of the NO2 colormap).
+        # CLI overrides take precedence.
+        if args.no_vmax is not None:
+            shared_no_vmax = args.no_vmax
+        elif len(snapshot_indices) > 1:
+            shared_no_vmax = max(to_ppbv(data['qNO'][i].max(), M_NO)
+                                 for i in snapshot_indices)
+        else:
+            shared_no_vmax = None
+
+        if args.no2_vmax is not None:
+            shared_no2_vmax = args.no2_vmax
+        elif len(snapshot_indices) > 1:
+            shared_no2_vmax = max(to_ppbv(data['qNO2'][i].max(), M_NO2)
+                                  for i in snapshot_indices)
+        else:
+            shared_no2_vmax = None
+
+        if args.o3_vmax is not None:
+            shared_o3_anom_max = args.o3_vmax
+        elif len(snapshot_indices) > 1:
+            qo3_anom = []
+            for i in snapshot_indices:
+                o3 = to_ppbv(data['qO3'][i], M_O3)
+                qo3_anom.append(np.abs(o3 - np.median(o3)).max())
+            shared_o3_anom_max = max(qo3_anom + [1e-6])
+        else:
+            shared_o3_anom_max = None
+
+        suffix_extra = '_lines' if args.no_fill else ''
         for idx in snapshot_indices:
             plot_vertical_cross_section(data, idx,
-                                        f'{base}_vertical{snap_suffix(idx)}.png',
+                                        f'{base}_vertical{snap_suffix(idx)}{suffix_extra}.png',
                                         y_slice=args.y_slice, dt_seconds=args.dt,
                                         w_threshold=args.w_threshold,
                                         w_ref=args.w_ref,
                                         z_min_m=args.z_min, z_max_m=args.z_max,
-                                        source_rate_ppbv=args.source_rate)
+                                        source_rate_ppbv=args.source_rate,
+                                        nox_vmin=args.nox_vmin,
+                                        no_vmax=shared_no_vmax,
+                                        no2_vmax=shared_no2_vmax,
+                                        o3_anom_max=shared_o3_anom_max,
+                                        no_fill=args.no_fill)
 
     if args.evolution or args.all:
         print("Generating time evolution...")
