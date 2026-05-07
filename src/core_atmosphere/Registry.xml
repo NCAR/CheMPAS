@@ -428,6 +428,18 @@
                      units="s"
                      description="NOx sink timescale in seconds (0 = no sink). Rate = 1/tau."
                      possible_values="Any non-negative real"/>
+                <nml_option name="config_lnox_gating_mode" type="character" default_value="altitude"
+                     units="-"
+                     description="Lightning NOx gating mode: 'altitude' uses z_min/z_max + linear w-scaling (current behavior); 'isotherm' uses t_min/t_max + constant rate (LNOx.md formulation)"
+                     possible_values="altitude, isotherm"/>
+                <nml_option name="config_lnox_t_min" type="real" default_value="233.15"
+                     units="K"
+                     description="Lower (cold) temperature bound for isotherm-mode lightning NOx injection"
+                     possible_values="Any positive real less than config_lnox_t_max"/>
+                <nml_option name="config_lnox_t_max" type="real" default_value="262.15"
+                     units="K"
+                     description="Upper (warm) temperature bound for isotherm-mode lightning NOx injection"
+                     possible_values="Any positive real greater than config_lnox_t_min"/>
                 <nml_option name="config_tuvx_config_file" type="character" default_value=""
                      units="-"
                      description="TUV-x configuration file name (empty = use Phase 1 cos(SZA) fallback)"

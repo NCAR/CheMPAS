@@ -8,6 +8,7 @@
 
 <immutable_stream name="restart"
                   type="input;output"
+                  io_type="netcdf"
                   filename_template="restart.$Y-$M-$D_$h.$m.$s.nc"
                   input_interval="initial_only"
                   output_interval="2:00:00"/>
@@ -17,7 +18,7 @@
         io_type="netcdf"
         filename_template="output.nc"
         filename_interval="none"
-        output_interval="00:30:00">
+        output_interval="00:10:00">
 
     <file name="stream_list.atmosphere.output"/>
 
