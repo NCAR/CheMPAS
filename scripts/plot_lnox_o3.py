@@ -744,6 +744,11 @@ def main():
                         help='Vertical level index (default: auto ~5 km)')
     parser.add_argument('-t', '--time', type=int, default=-1,
                         help='Time index (default: -1 = last)')
+    parser.add_argument('--every-min', type=float, default=None,
+                        help='Generate per-snapshot plots (vertical, comparison, '
+                             'profiles) at this cadence in simulation minutes. '
+                             'Filenames get a _tNNNmin suffix. '
+                             'Default: single snapshot at --time.')
     parser.add_argument('--dt', type=float, default=30.0,
                         help='Output interval in seconds (default: 30)')
     parser.add_argument('--y-slice', type=float, default=None,
@@ -813,14 +818,36 @@ def main():
                 args.comparison, args.profiles, args.source, args.photolysis]):
         args.all = True
 
+    # Snapshot-style plots (vertical, comparison, profiles) repeat per index.
+    # Aggregate-style plots (evolution, horizontal, source, photolysis) run once.
+    if args.every_min is not None and args.every_min > 0:
+        tm = data['time_minutes']
+        targets = np.arange(0.0, tm[-1] + 1e-6, args.every_min)
+        snapshot_indices = [int(np.argmin(np.abs(tm - t))) for t in targets]
+        # Deduplicate while preserving order (close cadences can repeat)
+        seen = set()
+        snapshot_indices = [i for i in snapshot_indices
+                            if not (i in seen or seen.add(i))]
+        print(f"  --every-min={args.every_min}: {len(snapshot_indices)} snapshots "
+              f"at t = {[round(tm[i], 1) for i in snapshot_indices]} min")
+    else:
+        snapshot_indices = [time_idx]
+
+    def snap_suffix(idx):
+        if args.every_min is None:
+            return ''
+        return f'_t{int(round(data["time_minutes"][idx])):03d}min'
+
     if args.vertical or args.all:
         print("Generating vertical cross-section...")
-        plot_vertical_cross_section(data, time_idx, f'{base}_vertical.png',
-                                    y_slice=args.y_slice, dt_seconds=args.dt,
-                                    w_threshold=args.w_threshold,
-                                    w_ref=args.w_ref,
-                                    z_min_m=args.z_min, z_max_m=args.z_max,
-                                    source_rate_ppbv=args.source_rate)
+        for idx in snapshot_indices:
+            plot_vertical_cross_section(data, idx,
+                                        f'{base}_vertical{snap_suffix(idx)}.png',
+                                        y_slice=args.y_slice, dt_seconds=args.dt,
+                                        w_threshold=args.w_threshold,
+                                        w_ref=args.w_ref,
+                                        z_min_m=args.z_min, z_max_m=args.z_max,
+                                        source_rate_ppbv=args.source_rate)
 
     if args.evolution or args.all:
         print("Generating time evolution...")
@@ -833,17 +860,21 @@ def main():
 
     if args.comparison or args.all:
         print("Generating species comparison...")
-        plot_species_comparison(data, level, time_idx,
-                                f'{base}_comparison.png', dt_seconds=args.dt,
-                                wind=args.wind, w_threshold=args.w_threshold,
-                                w_ref=args.w_ref,
-                                z_min_m=args.z_min, z_max_m=args.z_max,
-                                source_rate_ppbv=args.source_rate)
+        for idx in snapshot_indices:
+            plot_species_comparison(data, level, idx,
+                                    f'{base}_comparison{snap_suffix(idx)}.png',
+                                    dt_seconds=args.dt,
+                                    wind=args.wind, w_threshold=args.w_threshold,
+                                    w_ref=args.w_ref,
+                                    z_min_m=args.z_min, z_max_m=args.z_max,
+                                    source_rate_ppbv=args.source_rate)
 
     if args.profiles or args.all:
         print("Generating updraft profiles...")
-        plot_updraft_profiles(data, time_idx, f'{base}_profiles.png',
-                              dt_seconds=args.dt)
+        for idx in snapshot_indices:
+            plot_updraft_profiles(data, idx,
+                                  f'{base}_profiles{snap_suffix(idx)}.png',
+                                  dt_seconds=args.dt)
 
     if args.source or args.all:
         print("Generating source profiles...")
