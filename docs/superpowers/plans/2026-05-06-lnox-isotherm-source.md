@@ -78,16 +78,16 @@ Immediately after it (still inside `<nml_record name="musica">`), insert these t
 ```xml
                 <nml_option name="config_lnox_gating_mode" type="character" default_value="altitude"
                      units="-"
-                     description="Lightning NOx gating mode: 'altitude' uses z_min/z_max + linear w-scaling (current behavior); 'isotherm' uses T_min/T_max + constant rate (LNOx.md formulation)"
+                     description="Lightning NOx gating mode: 'altitude' uses z_min/z_max + linear w-scaling (current behavior); 'isotherm' uses t_min/t_max + constant rate (LNOx.md formulation)"
                      possible_values="altitude, isotherm"/>
-                <nml_option name="config_lnox_T_min" type="real" default_value="233.15"
+                <nml_option name="config_lnox_t_min" type="real" default_value="233.15"
                      units="K"
                      description="Lower (cold) temperature bound for isotherm-mode lightning NOx injection"
-                     possible_values="Any positive real less than config_lnox_T_max"/>
-                <nml_option name="config_lnox_T_max" type="real" default_value="262.15"
+                     possible_values="Any positive real less than config_lnox_t_max"/>
+                <nml_option name="config_lnox_t_max" type="real" default_value="262.15"
                      units="K"
                      description="Upper (warm) temperature bound for isotherm-mode lightning NOx injection"
-                     possible_values="Any positive real greater than config_lnox_T_min"/>
+                     possible_values="Any positive real greater than config_lnox_t_min"/>
 ```
 
 - [ ] **Step 2: Build and verify config_declare.inc picked up the new options**
@@ -97,7 +97,7 @@ Run the build command (see top of plan).
 Then check the generated declaration file:
 
 ```bash
-grep "config_lnox_gating_mode\|config_lnox_T_min\|config_lnox_T_max" \
+grep "config_lnox_gating_mode\|config_lnox_t_min\|config_lnox_t_max" \
      src/core_atmosphere/inc/config_declare.inc
 ```
 
@@ -105,8 +105,8 @@ Expected output: three `pointer` declaration lines, e.g.
 
 ```
       character (len=StrKIND), pointer :: config_lnox_gating_mode
-      real (kind=RKIND), pointer :: config_lnox_T_min
-      real (kind=RKIND), pointer :: config_lnox_T_max
+      real (kind=RKIND), pointer :: config_lnox_t_min
+      real (kind=RKIND), pointer :: config_lnox_t_max
 ```
 
 If grep returns nothing, the Registry preprocessor didn't pick up the change — re-check the XML for typos.
@@ -118,7 +118,7 @@ git add src/core_atmosphere/Registry.xml
 git commit -m "$(cat <<'EOF'
 feat(registry): add LNOx isotherm-mode namelist options
 
-Adds config_lnox_gating_mode, config_lnox_T_min, config_lnox_T_max to
+Adds config_lnox_gating_mode, config_lnox_t_min, config_lnox_t_max to
 the musica nml group. Default gating_mode = 'altitude' preserves
 existing behavior.
 
@@ -153,7 +153,7 @@ Locate the module-state block (currently lines 39–48):
     real(kind=RKIND), save :: z_max            = 12000.0_RKIND ! [m]
 ```
 
-Immediately after the `lnox_active` / `idx_qNO` lines, add the mode constants and mode state. Then add T_min / T_max parameters at the end of the parameter block. The result should look like:
+Immediately after the `lnox_active` / `idx_qNO` lines, add the mode constants and mode state. Then add t_min / t_max parameters at the end of the parameter block. The result should look like:
 
 ```fortran
     ! Module state
@@ -171,8 +171,8 @@ Immediately after the `lnox_active` / `idx_qNO` lines, add the mode constants an
     real(kind=RKIND), save :: w_ref            = 10.0_RKIND  ! excess updraft scale [m/s] (altitude mode only)
     real(kind=RKIND), save :: z_min            = 5000.0_RKIND ! [m] (altitude mode only)
     real(kind=RKIND), save :: z_max            = 12000.0_RKIND ! [m] (altitude mode only)
-    real(kind=RKIND), save :: T_min            = 233.15_RKIND ! [K] cold isotherm (isotherm mode only)
-    real(kind=RKIND), save :: T_max            = 262.15_RKIND ! [K] warm isotherm (isotherm mode only)
+    real(kind=RKIND), save :: t_min            = 233.15_RKIND ! [K] cold isotherm (isotherm mode only)
+    real(kind=RKIND), save :: t_max            = 262.15_RKIND ! [K] warm isotherm (isotherm mode only)
 ```
 
 - [ ] **Step 2: Add mode parsing + validation + isotherm-bound parsing in `lightning_nox_init`**
@@ -182,12 +182,12 @@ In the same file, locate the body of `lightning_nox_init`, specifically the exis
 ```fortran
         ! Read isotherm-mode bounds
         nullify(cfg_ptr)
-        call mpas_pool_get_config(configs, 'config_lnox_T_min', cfg_ptr)
-        if (associated(cfg_ptr)) T_min = cfg_ptr
+        call mpas_pool_get_config(configs, 'config_lnox_t_min', cfg_ptr)
+        if (associated(cfg_ptr)) t_min = cfg_ptr
 
         nullify(cfg_ptr)
-        call mpas_pool_get_config(configs, 'config_lnox_T_max', cfg_ptr)
-        if (associated(cfg_ptr)) T_max = cfg_ptr
+        call mpas_pool_get_config(configs, 'config_lnox_t_max', cfg_ptr)
+        if (associated(cfg_ptr)) t_max = cfg_ptr
 
         ! Read gating mode (string -> integer flag)
         block
@@ -217,8 +217,8 @@ Still inside `lightning_nox_init`, find the existing `lnox_active = .true.` line
 ```fortran
         ! Mode-specific validation
         if (mode == MODE_ISOTHERM) then
-            if (T_min <= 0.0_RKIND .or. T_max <= 0.0_RKIND .or. T_min >= T_max) then
-                call mpas_log_write('[LNOx] Invalid isotherm bounds (require 0 < T_min < T_max); lightning source disabled.')
+            if (t_min <= 0.0_RKIND .or. t_max <= 0.0_RKIND .or. t_min >= t_max) then
+                call mpas_log_write('[LNOx] Invalid isotherm bounds (require 0 < t_min < t_max); lightning source disabled.')
                 lnox_active = .false.
                 return
             end if
@@ -237,8 +237,8 @@ Still inside `lightning_nox_init`, find the existing `lnox_active = .true.` line
             call mpas_log_write('[LNOx]   z_max        = $r m', realArgs=(/z_max/))
         else
             call mpas_log_write('[LNOx]   gating_mode  = isotherm')
-            call mpas_log_write('[LNOx]   T_min        = $r K (cold)', realArgs=(/T_min/))
-            call mpas_log_write('[LNOx]   T_max        = $r K (warm)', realArgs=(/T_max/))
+            call mpas_log_write('[LNOx]   t_min        = $r K (cold)', realArgs=(/t_min/))
+            call mpas_log_write('[LNOx]   t_max        = $r K (warm)', realArgs=(/t_max/))
         end if
 ```
 
@@ -259,7 +259,7 @@ git add src/core_atmosphere/chemistry/mpas_lightning_nox.F
 git commit -m "$(cat <<'EOF'
 feat(lnox): add gating-mode flag and isotherm bounds plumbing
 
-Adds MODE_ALTITUDE / MODE_ISOTHERM constants, T_min / T_max parameter
+Adds MODE_ALTITUDE / MODE_ISOTHERM constants, t_min / t_max parameter
 state, init-time parsing of config_lnox_gating_mode and isotherm
 bounds with validation. Inject loop unchanged in this commit; mode
 flag still affects only the init-time log output.
@@ -393,8 +393,8 @@ Replace with a mode-branching version. The altitude branch is **bit-identical** 
                     w_mid = 0.5_RKIND * (w(k, iCell) + w(k+1, iCell))
 
                     if (w_mid > w_threshold .and. &
-                        temperature(k, iCell) >= T_min .and. &
-                        temperature(k, iCell) <= T_max) then
+                        temperature(k, iCell) >= t_min .and. &
+                        temperature(k, iCell) <= t_max) then
 
                         ! Constant source (LNOx.md formulation): no w-scaling.
                         delta_q = source_rate_ppbv &
@@ -427,7 +427,7 @@ feat(lnox): add isotherm-mode inject branch
 Adds optional temperature(:,:) argument to lightning_nox_inject and
 branches the inner loop on the gating mode. Altitude branch is
 bit-identical to the previous code; isotherm branch gates on
-T_min <= T <= T_max plus the same w_threshold hard gate, with a
+t_min <= T <= t_max plus the same w_threshold hard gate, with a
 constant source rate (no w-scaling).
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
@@ -567,8 +567,8 @@ Immediately after the closing `! /` and the blank `!` separator line of that blo
 !     config_lnox_gating_mode = 'isotherm'
 !     config_lnox_source_rate = 1.0e-3
 !     config_lnox_w_threshold = 5.0
-!     config_lnox_T_min = 233.15
-!     config_lnox_T_max = 262.15
+!     config_lnox_t_min = 233.15
+!     config_lnox_t_max = 262.15
 !     config_lnox_j_no2 = 0.01
 !     config_lnox_nox_tau = 0.0
 !     config_chemistry_latitude = 35.86
@@ -671,7 +671,7 @@ grep -A 1 "Lightning NOx source enabled" log.atmosphere.0000.out
 grep "gating_mode" log.atmosphere.0000.out
 ```
 
-Expected: log shows `gating_mode = altitude` and the four altitude params (`source_rate`, `w_threshold`, `w_ref`, `z_min`, `z_max`). T_min / T_max should NOT be logged.
+Expected: log shows `gating_mode = altitude` and the four altitude params (`source_rate`, `w_threshold`, `w_ref`, `z_min`, `z_max`). t_min / t_max should NOT be logged.
 
 - [ ] **Step 4: Verify qNO is non-trivial and finite**
 
@@ -734,10 +734,10 @@ Expected: run completes, `output.nc` is fresh.
 
 ```bash
 grep -A 1 "Lightning NOx source enabled" log.atmosphere.0000.out
-grep "gating_mode\|T_min\|T_max" log.atmosphere.0000.out
+grep "gating_mode\|t_min\|t_max" log.atmosphere.0000.out
 ```
 
-Expected: log shows `gating_mode = isotherm`, `T_min = 233.15 K (cold)`, `T_max = 262.15 K (warm)`. `z_min` / `z_max` / `w_ref` should NOT be logged.
+Expected: log shows `gating_mode = isotherm`, `t_min = 233.15 K (cold)`, `t_max = 262.15 K (warm)`. `z_min` / `z_max` / `w_ref` should NOT be logged.
 
 - [ ] **Step 4: Verify qNO is non-trivial, finite, and confined to the mixed-phase layer**
 
@@ -801,7 +801,7 @@ Skimming the spec against this plan:
 - **§ Test-case namelist additions** → Task 5. ✓
 - **§ Calibration starting point (1.0e-3 ppbv/s)** → Task 5 namelist value. ✓
 - **§ Verification: build, regression, new behavior** → Task 6 (clean build) + Task 7 (altitude regression) + Task 8 (isotherm e2e). ✓
-- **§ Error handling: unknown mode, T_min/T_max validation, missing T** → Task 2 Step 2 (unknown mode), Task 2 Step 3 (validation), Task 3 Step 2 (missing T inside inject), Task 4 Step 1 (missing inputs at call site). ✓
+- **§ Error handling: unknown mode, t_min/t_max validation, missing T** → Task 2 Step 2 (unknown mode), Task 2 Step 3 (validation), Task 3 Step 2 (missing T inside inject), Task 4 Step 1 (missing inputs at call site). ✓
 
 **Placeholder scan:** no TBDs, no TODOs, no "implement later." Calibration is left as a follow-up but with a concrete starting value and a clear retune procedure.
 

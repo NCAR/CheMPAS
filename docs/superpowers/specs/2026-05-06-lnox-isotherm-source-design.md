@@ -58,7 +58,7 @@ the per-cell loop branches on an integer, not a string.
 | Mode | Gate | Rate |
 |---|---|---|
 | `altitude` (default) | `z_min ≤ z ≤ z_max` AND `w > w_threshold` | `S = source_rate · (w − w_threshold) / w_ref` |
-| `isotherm` (new) | `T_min ≤ T ≤ T_max` AND `w > w_threshold` | `S = source_rate` (constant) |
+| `isotherm` (new) | `t_min ≤ T ≤ t_max` AND `w > w_threshold` | `S = source_rate` (constant) |
 
 The `w > w_threshold` requirement in isotherm mode is a hard on/off gate
 (no rate scaling), so emission is still tied to active convection but
@@ -70,8 +70,8 @@ Added to `Registry.xml` under the `musica` group:
 
 ```
 config_lnox_gating_mode  string  default = 'altitude'
-config_lnox_T_min        real    default = 233.15  ! K, cold isotherm
-config_lnox_T_max        real    default = 262.15  ! K, warm isotherm
+config_lnox_t_min        real    default = 233.15  ! K, cold isotherm
+config_lnox_t_max        real    default = 262.15  ! K, warm isotherm
 ```
 
 Existing options (`config_lnox_source_rate`, `config_lnox_w_threshold`,
@@ -175,8 +175,8 @@ LNOx.md formulation)" and including the new options.
   `"altitude"` nor `"isotherm"`, `lightning_nox_init` logs a critical
   message and sets `lnox_active = .false.` (same fall-through pattern
   as the existing `source_rate <= 0` guard).
-- **Isotherm-mode parameter validation:** require `T_min > 0` and
-  `T_min < T_max`; otherwise log and disable.
+- **Isotherm-mode parameter validation:** require `t_min > 0` and
+  `t_min < t_max`; otherwise log and disable.
 - **Missing temperature in isotherm mode:** the call site already guards
   the inject call on `associated(scalars) .and. associated(w) .and.
   associated(zgrid)`; extend that guard to cover `theta_m`, `exner`, and
@@ -189,7 +189,7 @@ LNOx.md formulation)" and including the new options.
 
 | File | Change |
 |---|---|
-| `src/core_atmosphere/Registry.xml` | Add `config_lnox_gating_mode`, `config_lnox_T_min`, `config_lnox_T_max` to the `musica` nml group |
+| `src/core_atmosphere/Registry.xml` | Add `config_lnox_gating_mode`, `config_lnox_t_min`, `config_lnox_t_max` to the `musica` nml group |
 | `src/core_atmosphere/chemistry/mpas_lightning_nox.F` | Add mode flag, isotherm branch in inject loop, optional `temperature` arg, init-time mode validation and logging |
 | `src/core_atmosphere/chemistry/mpas_atm_chemistry.F` | Compute `temperature(nVertLevels,nCells)` from `theta_m / exner / qv` when LNOx is active in isotherm mode; pass to `lightning_nox_inject` |
 | `test_cases/supercell/namelist.atmosphere` | Add a second commented-out `&musica` block for the isotherm-mode setup |
