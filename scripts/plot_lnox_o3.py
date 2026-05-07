@@ -270,9 +270,11 @@ def plot_vertical_cross_section(data, time_idx, output_file, y_slice=None,
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
-    # (a) O3 in ppbv — show full range anchored at 0
+    # (a) O3 in ppbv — anchor at field min/max so the LNOx-driven loss
+    # near background is visible. With background ~50 ppbv and a few-ppbv
+    # loss in the source region, anchoring at 0 hides all the structure.
     ax = axes[0, 0]
-    o3_levels = smart_levels(0, max(o3_slice.max(), 1.0))
+    o3_levels = smart_levels(o3_slice.min(), o3_slice.max())
     cf = ax.contourf(X, Z, o3_slice.T, levels=o3_levels, cmap='ncar_sunset')
     rasterize_contours(cf)
     add_colorbar(cf, ax, label='ppbv')
