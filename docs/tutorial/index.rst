@@ -21,3 +21,4 @@ worked examples specific to CheMPAS-A's MUSICA/MICM coupling.
    01-overview
    02-supercell
    03-chapman-nox
+   04-chapman-nox-global
