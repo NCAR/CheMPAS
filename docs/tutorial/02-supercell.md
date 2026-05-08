@@ -273,6 +273,10 @@ timestamp=$(date +%Y%m%d_%H%M%S)
     mv log.atmosphere.0000.out log.atmosphere.0000.${timestamp}.out
 
 mpiexec -n 8 ~/EarthSystem/CheMPAS-A/atmosphere_model
+
+# Name the altitude-mode artifacts so they survive the §2.6.2 run.
+[ -f output.nc ] && mv output.nc output.altitude.nc
+[ -f log.atmosphere.0000.out ] && mv log.atmosphere.0000.out log.altitude.out
 ```
 
 **Plot.** The dedicated LNOx plotting script produces the standard
@@ -281,7 +285,8 @@ partitioning ratio):
 
 ```bash
 ~/miniconda3/envs/mpas/bin/python \
-    ~/EarthSystem/CheMPAS-A/scripts/plot_lnox_o3.py
+    ~/EarthSystem/CheMPAS-A/scripts/plot_lnox_o3.py \
+    -i output.altitude.nc -o lnox_altitude.png
 ```
 
 **[Figure 2.3: NO, NO₂, O₃ at t = 2 h, LNOx + O3 mechanism, altitude
@@ -331,15 +336,14 @@ rate is constant: `S = source_rate` whenever the gate is open.
 `LNOX_INTEGRATION.md`; expect to retune by a small factor after the
 first run.
 
-**Archive prior output and run.** Move the altitude-mode `output.nc`
-aside before re-running so the two outputs survive side by side:
+**Run, then name the artifacts.** §2.6.1 already left
+`output.altitude.nc` in place; this run produces `output.isotherm.nc`
+so §2.6.3 can read both side-by-side:
 
 ```bash
-[ -f output.nc ] && mv output.nc output.altitude.nc
-[ -f log.atmosphere.0000.out ] && mv log.atmosphere.0000.out log.altitude.out
-
 mpiexec -n 8 ~/EarthSystem/CheMPAS-A/atmosphere_model
 
+# Name the isotherm-mode artifacts so the §2.6.3 comparison can read both.
 [ -f output.nc ] && mv output.nc output.isotherm.nc
 [ -f log.atmosphere.0000.out ] && mv log.atmosphere.0000.out log.isotherm.out
 ```
@@ -356,8 +360,9 @@ mpiexec -n 8 ~/EarthSystem/CheMPAS-A/atmosphere_model
 gating. To be added.]**
 
 What to look for: NO emission confined to the 233–262 K mixed-phase
-layer of the storm — typically ~5–9 km on this thermodynamic profile
-but moving with the cloud rather than pinned to a fixed altitude.
+layer of the storm — approximately mid-troposphere on the
+Weisman–Klemp sounding used here — but moving with the cloud rather
+than pinned to a fixed altitude.
 The peak NOx in the convective core should be of order 1 ppbv (the
 LNOx.md DC3 target). If your peak is off by more than a factor of a
 few, retune `config_lnox_source_rate` and re-run.
@@ -398,6 +403,8 @@ column). To be added.]**
 This section is being revised.
 ```
 
+("LNOx + O3" in this section refers to either gating mode — the
+ABBA vs. LNOx contrast applies the same way to both.)
 Placing the two final-state plots side by side highlights what's
 shared and what differs. The dynamics are identical: the same updraft
 and cold-pool outflow advect qAB in the ABBA run and NO/NO₂/O₃ in the
