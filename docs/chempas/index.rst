@@ -19,6 +19,7 @@ plans, validation results, and upstream-comparison notes.
    musica/MUSICA_INTEGRATION
    musica/MUSICA_API
    guides/TUVX_INTEGRATION
+   guides/LNOX_INTEGRATION
    guides/VISUALIZE
 
 .. toctree::

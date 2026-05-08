@@ -402,9 +402,12 @@ This section is being revised.
   [docs/chempas/guides/TUVX_INTEGRATION.md](https://github.com/NCAR/CheMPAS-A/blob/develop/docs/chempas/guides/TUVX_INTEGRATION.md).
 - **Upstream MUSICA, MICM, and TUV-x docs** are linked from the
   [project landing page](../index.rst) in the *See also* section.
-- **Future tutorial chapters** will cover additional idealized cases
-  (mountain wave, JW baroclinic wave, chem box) when they're
-  written. *(Not yet scheduled.)*
+- **The next chapter** is
+  [Chapman + NOx Global](04-chapman-nox-global.md) — the same
+  chemistry on the `x1.40962` global mesh, where the day–night
+  photolysis terminator and zonal-mean ozone response become visible.
+- **Further idealized cases** (mountain wave, chem box) will be added
+  when their tutorial chapters are written. *(Not yet scheduled.)*
 
 ## 3.10 Standalone Chapman + NOx column model
 

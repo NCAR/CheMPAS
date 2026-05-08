@@ -195,14 +195,29 @@ This section is being revised.
 
 The LNOx + O3 setup (`micm_configs/lnox_o3.yaml`) is a tropospheric
 gas-phase configuration with three prognostic species — NO, NO₂, and
-O₃ — and a parameterized lightning-NOx source term tied to the model's
-vertical velocity. It is the smallest realistic chemistry case in
-CheMPAS-A: enough species and reactions to exercise the MICM solver,
-TUV-x photolysis, and the LNOx source coupling, without the cost of a
-full tropospheric mechanism.
+O₃ — and a parameterized lightning-NOx source term. It is the
+smallest realistic chemistry case in CheMPAS-A: enough species and
+reactions to exercise the MICM solver, TUV-x photolysis, and the LNOx
+source coupling, without the cost of a full tropospheric mechanism.
+
+The lightning-NOx source has two gating modes, configurable through
+the `&musica` namelist:
+
+- **Altitude-mode** gating (the inherited DAVINCI-MPAS formulation) —
+  emit NO in a fixed altitude window, with rate scaled by updraft
+  excess.
+- **Isotherm-mode** gating (new, faithful to the DC3 mixed-phase
+  framing in `LNOx.md`) — emit NO in a temperature window
+  corresponding to the 233–262 K layer, at a constant rate.
+
+This section walks through both modes as parallel runs and then
+compares them. The full scheme description, namelist surface, and
+calibration notes live in
+[docs/chempas/guides/LNOX_INTEGRATION.md](https://github.com/NCAR/CheMPAS-A/blob/develop/docs/chempas/guides/LNOX_INTEGRATION.md).
 
 **Initialize the LNOx tracers.** The supercell init file does not
-contain NO / NO₂ / O₃; populate them with a one-time script:
+contain NO / NO₂ / O₃; populate them with a one-time script. Both
+gating modes use the same initial state:
 
 ```bash
 cd ~/Data/CheMPAS/supercell
@@ -213,8 +228,16 @@ cd ~/Data/CheMPAS/supercell
 This sets NO = 0, NO₂ = 0, and O₃ = 50 ppbv (background) throughout
 the domain.
 
+### 2.6.1 LNOx with altitude-mode gating
+
+```{admonition} Draft - revisions in progress
+:class: warning
+
+This section is being revised.
+```
+
 **Edit the namelist.** Replace the `&musica` block in
-`namelist.atmosphere` with the full LNOx tropospheric setup:
+`namelist.atmosphere` with the altitude-mode configuration:
 
 ```fortran
 &musica
@@ -222,6 +245,7 @@ the domain.
     config_tuvx_config_file = 'tuvx_no2.json'
     config_tuvx_top_extension = .true.
     config_tuvx_extension_file = 'tuvx_upper_atm.csv'
+    config_lnox_gating_mode = 'altitude'
     config_lnox_source_rate = 0.5
     config_lnox_w_threshold = 5.0
     config_lnox_w_ref = 10.0
@@ -234,11 +258,11 @@ the domain.
 /
 ```
 
-The lightning-NOx source injects NO into grid cells where the vertical
+In altitude mode, NO is injected into grid cells where the vertical
 velocity exceeds `config_lnox_w_threshold` and the height falls
-between `config_lnox_z_min` and `config_lnox_z_max`. See
-[docs/chempas/guides/TUVX_INTEGRATION.md](https://github.com/NCAR/CheMPAS-A/blob/develop/docs/chempas/guides/TUVX_INTEGRATION.md)
-for the TUV-x configuration files referenced in the block.
+between `config_lnox_z_min` and `config_lnox_z_max`. The per-cell
+emission rate is `S = source_rate · (w − w_threshold) / w_ref`, so
+stronger updrafts emit more NO.
 
 **Archive prior output and run.** Same pattern as the ABBA run:
 
@@ -249,23 +273,127 @@ timestamp=$(date +%Y%m%d_%H%M%S)
     mv log.atmosphere.0000.out log.atmosphere.0000.${timestamp}.out
 
 mpiexec -n 8 ~/EarthSystem/CheMPAS-A/atmosphere_model
+
+# Name the altitude-mode artifacts so they survive the §2.6.2 run.
+[ -f output.nc ] && mv output.nc output.altitude.nc
+[ -f log.atmosphere.0000.out ] && mv log.atmosphere.0000.out log.altitude.out
 ```
 
 **Plot.** The dedicated LNOx plotting script produces the standard
-diagnostic set (vertical cross-sections, time series, NO₂ partitioning
-ratio):
+diagnostic set (vertical cross-sections, time series, NO₂
+partitioning ratio):
 
 ```bash
 ~/miniconda3/envs/mpas/bin/python \
-    ~/EarthSystem/CheMPAS-A/scripts/plot_lnox_o3.py
+    ~/EarthSystem/CheMPAS-A/scripts/plot_lnox_o3.py \
+    -i output.altitude.nc -o lnox_altitude.png
 ```
 
-**[Figure 2.3: NO, NO₂, O₃ at t = 2 h, LNOx + O3 mechanism. To be added.]**
+**[Figure 2.3: NO, NO₂, O₃ at t = 2 h, LNOx + O3 mechanism, altitude
+gating. To be added.]**
 
 What to look for: a localized NO source in the updraft column where
 the vertical-velocity threshold is exceeded, downwind transport of
 NO + NO₂ along the anvil, and an O₃ depletion signature in the freshly
-emitted plume (titration by NO).
+emitted plume (titration by NO). The injected volume is a fixed
+5–12 km altitude band — a slab whose location does not move with the
+storm thermal structure.
+
+### 2.6.2 LNOx with isotherm-mode gating
+
+```{admonition} Draft - revisions in progress
+:class: warning
+
+This section is being revised.
+```
+
+**Edit the namelist.** Replace the `&musica` block with the isotherm
+configuration:
+
+```fortran
+&musica
+    config_micm_file = 'lnox_o3.yaml'
+    config_tuvx_config_file = 'tuvx_no2.json'
+    config_tuvx_top_extension = .true.
+    config_tuvx_extension_file = 'tuvx_upper_atm.csv'
+    config_lnox_gating_mode = 'isotherm'
+    config_lnox_source_rate = 1.0e-3
+    config_lnox_w_threshold = 5.0
+    config_lnox_t_min = 233.15
+    config_lnox_t_max = 262.15
+    config_lnox_j_no2 = 0.01
+    config_lnox_nox_tau = 0.0
+    config_chemistry_latitude = 35.86
+    config_chemistry_longitude = -97.93
+/
+```
+
+In isotherm mode, NO is injected into grid cells where the cell
+temperature is between `config_lnox_t_min` and `config_lnox_t_max`
+*and* the updraft exceeds `config_lnox_w_threshold`. The emission
+rate is constant: `S = source_rate` whenever the gate is open.
+`source_rate = 1.0e-3 ppbv/s` is the calibration starting point in
+`LNOX_INTEGRATION.md`; expect to retune by a small factor after the
+first run.
+
+**Run, then name the artifacts.** §2.6.1 already left
+`output.altitude.nc` in place; this run produces `output.isotherm.nc`
+so §2.6.3 can read both side-by-side:
+
+```bash
+mpiexec -n 8 ~/EarthSystem/CheMPAS-A/atmosphere_model
+
+# Name the isotherm-mode artifacts so the §2.6.3 comparison can read both.
+[ -f output.nc ] && mv output.nc output.isotherm.nc
+[ -f log.atmosphere.0000.out ] && mv log.atmosphere.0000.out log.isotherm.out
+```
+
+**Plot.** Same plotting script; point it at the isotherm output:
+
+```bash
+~/miniconda3/envs/mpas/bin/python \
+    ~/EarthSystem/CheMPAS-A/scripts/plot_lnox_o3.py -i output.isotherm.nc \
+    -o lnox_isotherm.png
+```
+
+**[Figure 2.4: NO, NO₂, O₃ at t = 2 h, LNOx + O3 mechanism, isotherm
+gating. To be added.]**
+
+What to look for: NO emission confined to the 233–262 K mixed-phase
+layer of the storm — approximately mid-troposphere on the
+Weisman–Klemp sounding used here — but moving with the cloud rather
+than pinned to a fixed altitude.
+The peak NOx in the convective core should be of order 1 ppbv (the
+LNOx.md DC3 target). If your peak is off by more than a factor of a
+few, retune `config_lnox_source_rate` and re-run.
+
+### 2.6.3 Comparing the gating modes
+
+```{admonition} Draft - revisions in progress
+:class: warning
+
+This section is being revised.
+```
+
+Placing the two LNOx runs side by side highlights what the gating
+choice changes. Spatially, altitude mode emits into a fixed slab
+(`z_min`–`z_max`), so the NO source volume is the same regardless of
+where the storm thermal structure sits; isotherm mode emits into the
+mixed-phase layer, so the source volume shifts vertically as the
+storm evolves and the 233–262 K layer moves up or down. In rate, the
+altitude formulation scales with updraft excess so the strongest
+updrafts emit the most NO; the isotherm formulation is flat — once
+the gate is open, every active cell emits at the same rate, faithful
+to the LNOx.md "constant emission" framing.
+
+The downwind chemistry the two formulations imply — NO + O₃
+titration, NO₂ photolysis, anvil-level NOx redistribution — is
+identical because the MICM mechanism and TUV-x configuration are the
+same; only the emission gating differs.
+
+**[Figure 2.5: Side-by-side qNO, qNO₂, qO₃ final-state cross-sections
+at t = 2 h: altitude mode (left column) vs. isotherm mode (right
+column). To be added.]**
 
 ## 2.7 Comparing the two runs
 
@@ -275,6 +403,8 @@ emitted plume (titration by NO).
 This section is being revised.
 ```
 
+("LNOx + O3" in this section refers to either gating mode — the
+ABBA vs. LNOx contrast applies the same way to both.)
 Placing the two final-state plots side by side highlights what's
 shared and what differs. The dynamics are identical: the same updraft
 and cold-pool outflow advect qAB in the ABBA run and NO/NO₂/O₃ in the
@@ -292,7 +422,7 @@ This is the pedagogical payoff of running the same dynamics with two
 mechanisms: it isolates "what the flow does" from "what the chemistry
 does."
 
-**[Figure 2.4: Side-by-side comparison of ABBA tracer transport and
+**[Figure 2.6: Side-by-side comparison of ABBA tracer transport and
 LNOx + O3 chemistry at t = 2 h. To be added.]**
 
 ## 2.8 Verifying numerically
@@ -324,9 +454,14 @@ This section is being revised.
 - **The next chapter** is
   [Chapman + NOx Photostationary State](03-chapman-nox.md) — a small
   domain where the analytical PSS solution is a clean check on the
-  coupled MICM + TUV-x configuration.
+  coupled MICM + TUV-x configuration. Chapter 4 then runs the same
+  chemistry on the global `x1.40962` mesh:
+  [Chapman + NOx Global](04-chapman-nox-global.md).
 - **The MUSICA/MICM coupling internals** are documented in
   [docs/chempas/musica/MUSICA_INTEGRATION.md](https://github.com/NCAR/CheMPAS-A/blob/develop/docs/chempas/musica/MUSICA_INTEGRATION.md).
+- **The LNOx scheme** — both gating modes, full namelist surface,
+  and calibration notes — is documented in
+  [docs/chempas/guides/LNOX_INTEGRATION.md](https://github.com/NCAR/CheMPAS-A/blob/develop/docs/chempas/guides/LNOX_INTEGRATION.md).
 - **TUV-x photolysis** configuration is documented in
   [docs/chempas/guides/TUVX_INTEGRATION.md](https://github.com/NCAR/CheMPAS-A/blob/develop/docs/chempas/guides/TUVX_INTEGRATION.md).
 - **Upstream MUSICA, MICM, and TUV-x docs** are linked from the
@@ -357,7 +492,7 @@ Run:
     ~/EarthSystem/CheMPAS-A/scripts/musica_python/abba_box.py
 ```
 
-**[Figure 2.5: A, B, AB concentrations from the standalone ABBA box
+**[Figure 2.7: A, B, AB concentrations from the standalone ABBA box
 model over a 2 h integration. To be added.]**
 
 What to look for: AB drops from 1 mol m⁻³ toward the analytical
@@ -449,7 +584,7 @@ Run:
     ~/EarthSystem/CheMPAS-A/scripts/musica_python/lnox_box.py
 ```
 
-**[Figure 2.6: NO, NO₂, O₃ from the standalone LNOx + O₃ box model.
+**[Figure 2.8: NO, NO₂, O₃ from the standalone LNOx + O₃ box model.
 The first ~minute shows NO/NO₂ relaxing to the Leighton PSS; over
 2 h, slow O₃ titration is visible. To be added.]**
 

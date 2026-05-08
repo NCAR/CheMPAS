@@ -24,6 +24,7 @@ rm *.tar.gz
 | `mountain_wave/` | 6 | ~577 m | ~2k | 70 | 6 | 5 hours |
 | `jw_baroclinic_wave/` | 2 | 120 km | 40,962 | 26 | 450 | 16 days |
 | `chem_box/` | 5 | 500 m periodic 8×8 | 64 | 60 (stretched 0–50 km) | 3 | 1 hour |
+| `chapman_nox_global/` | (reuses JW init, see below) | 120 km | 40,962 | 26 | 450 | 24 hours |
 
 The supercell vertical grid is read from `test_cases/supercell/supercell_zeta_levels.txt`
 (61 edge heights in metres) via the `config_specified_zeta_levels` namelist option.
@@ -35,6 +36,27 @@ tarball — build the mesh and partitions locally with `planar_hex`
 + `MpasMeshConverter.x` + `gpmetis` (all in the `mpas` conda env).
 See `docs/chempas/plans/2026-04-18-chapman-nox-chem-box-issue.md` for the
 exact reproduction steps and the chemistry configs it pairs with.
+
+The `chapman_nox_global` case reuses the JW baroclinic-wave init
+mesh (`x1.40962.init.nc`) as the dynamics initial state; it is not a
+baroclinic-wave dynamics demonstration, just a convenient global
+init. Setting it up takes one extra step beyond the standard
+download-and-init loop below:
+
+1. Run the standard JW baroclinic-wave init (the
+   `init_atmosphere_model` step in the loop below already produces
+   `~/Data/CheMPAS/jw_baroclinic_wave/x1.40962.init.nc`).
+2. Symlink that file into `~/Data/CheMPAS/chapman_nox_global/`.
+3. Run `scripts/init_chapman_nox.py` from the new run directory to
+   inject Chapman + NOx tracers into a copy of the init NetCDF. The
+   output (`x1.40962.chapman_nox_init.nc`) is what the
+   `streams.atmosphere` config reads.
+4. Copy the tracked `test_cases/chapman_nox_global/` configs and
+   the `x1.40962.graph.info.part.8` partition file into the run
+   directory.
+
+See [`docs/tutorial/04-chapman-nox-global.md`](../docs/tutorial/04-chapman-nox-global.md)
+§4.3–§4.5 for the full setup walkthrough with explicit commands.
 
 ## Setup and Initialization
 
