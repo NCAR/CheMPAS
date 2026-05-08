@@ -22,6 +22,7 @@ live one level up under `docs/users-guide/` and
 - [results/TEST_RUNS.md](results/TEST_RUNS.md) - Recorded run outcomes
 - [guides/VISUALIZE.md](guides/VISUALIZE.md) - Visualization workflows
 - [guides/TUVX_INTEGRATION.md](guides/TUVX_INTEGRATION.md) - TUV-x summary and development test case
+- [guides/LNOX_INTEGRATION.md](guides/LNOX_INTEGRATION.md) - LNOx scheme guide (both gating modes, namelist, calibration)
 - [plans/README.md](plans/README.md) - Dated implementation plans
 - [upstream/2026-04-19-vs-mpas-v8.3.1.md](upstream/2026-04-19-vs-mpas-v8.3.1.md) - Baseline comparison against upstream MPAS v8.3.1
 - [../users-guide/00-foreword.md](../users-guide/00-foreword.md) - Imported MPAS user guide chapters
