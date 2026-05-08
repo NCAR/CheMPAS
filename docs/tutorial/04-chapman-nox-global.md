@@ -67,8 +67,8 @@ runs on whatever flow the dynamics produce, but the dominant signal
 in the chemistry diagnostics is the diurnal photolysis cycle, not
 the dynamics.
 
-**[Figure 4.1: AFGL-Gaussian initial qO₃ profile injected globally
-by `init_chapman_nox.py`. To be added.]**
+**[Figure 4.1: Gaussian initial qO₃ profile (peak 10 ppmm at 25 km,
+σ = 7 km) injected globally by `init_chapman_nox.py`. To be added.]**
 
 ## 4.3 Setup
 
@@ -135,9 +135,10 @@ What the script writes:
 - `qO3` — Gaussian peak of 10 ppmm at 25 km, σ = 7 km.
   Function of altitude only; horizontal structure comes from the
   chemistry's diurnal cycle, not from the initial state.
-- `qO`, `qO1D` — small floor (1×10⁻¹². The fast-radical species spin
-  up to Chapman quasi-steady-state within seconds on the first
-  sunlit step).
+- `qO` — small floor (1×10⁻¹²). `qO1D` is not seeded; the runtime
+  default of zero is fine for a fast radical that the chemistry
+  spins up to Chapman quasi-steady-state within seconds on the first
+  sunlit step (consistent with Ch. 3 §3.5).
 - `qNO`, `qNO2` — 1 ppbv background each, uniform with altitude.
   Lower than the stratospheric NOx peak (~10 ppb in §3.5) but
   sufficient to drive a visible terminator-aligned partition flip.
@@ -183,10 +184,13 @@ The tracked `&musica` block reads:
 
 No `config_chemistry_latitude` / `config_chemistry_longitude` —
 `use_grid_coords = .true.` overrides those, and every cell gets its
-own SZA. The 3600 s TUV-x update interval is much longer than the
-small-domain Ch. 3 case (which used 600 s); on a 24-hour global run
+own SZA. The 3600 s TUV-x update interval is a deliberate choice
+for this case; the Ch. 3 small-domain run does not set
+`config_tuvx_update_interval` and falls back to the registry default
+of 0.0 (TUV-x runs every chemistry step). On a 24-hour global run
 the SZA evolves slowly enough that hourly TUV-x updates resolve the
-terminator sweep correctly.
+terminator sweep correctly without running TUV-x on every chemistry
+step.
 
 **Archive prior output and run.** Same pattern as Chapter 2 / Chapter 3:
 
@@ -230,18 +234,23 @@ cd ~/Data/CheMPAS/chapman_nox_global
 
 The four figures:
 
-- **`jNO2_terminator.png`** — jNO₂ maps at t = 0, 6, 12, 18 UTC.
-  The day–night terminator sweeps across the globe four times in this
-  panel, visible as a sharp drop in jNO₂ at the photolysis edge.
+- **`jNO2_terminator.png`** — jNO₂ maps at t = 3, 9, 15, 21 UTC.
+  The day–night terminator sweeps across the globe four times in
+  this panel, visible as a sharp drop in jNO₂ at the photolysis
+  edge. (t = 0 is skipped because TUV-x has not yet fired at the
+  initial output frame, so jNO₂ is identically zero there.)
   Triangulated mesh rendering with antimeridian-spanning triangles
   masked, so the limb is clean.
 
-  **[Figure 4.2: jNO₂ terminator-sweep map at t = 0 / 6 / 12 / 18
+  **[Figure 4.2: jNO₂ terminator-sweep map at t = 3 / 9 / 15 / 21
   UTC. To be added.]**
 
 - **`tracers_evolution.png`** — qO₃ at level 22 (≈36 km, where the
   Chapman cycle is most active) and qNO₂ at level 17 (≈25 km, near
-  the seeded NOx peak), shown at t = 12 h and t = 24 h.
+  the seeded NOx peak), shown at t = 12 h and t = 24 h. The level
+  indices are tied to the JW 26-level grid via the `LEVEL_O3` and
+  `LEVEL_NO2` constants in `plot_chapman_nox_global.py`; if the
+  vertical grid changes, those constants need to be retuned.
 
   **[Figure 4.3: qO₃ at ≈36 km and qNO₂ at ≈25 km, t = 12 h and t =
   24 h. To be added.]**
@@ -282,8 +291,9 @@ Three diagnostics worth checking by eye:
   t = 12 h and t = 24 h are spaced exactly one local-noon apart at
   the prime meridian.
 - **Ozone modulation magnitude.** In `tracers_evolution.png` and
-  `o3_profile.png`, expect a few-percent diurnal modulation in qO₃
-  at 36 km. The 24-hour integration is too short for the column to
+  `o3_profile.png`, expect a small diurnal modulation in qO₃ at
+  36 km, visible as a difference between the t = 12 h and t = 24 h
+  panels. The 24-hour integration is too short for the column to
   fully relax; longer runs (multi-day, off the scope of this
   chapter) would show a slow drift toward the steady state.
 
