@@ -255,6 +255,7 @@ Idealized test cases are in `~/Data/CheMPAS/`:
 | Supercell | `~/Data/CheMPAS/supercell/` | 2 hours | 60 stretched levels to 50 km (~300 m surface → ~1 km top) |
 | Mountain wave | `~/Data/CheMPAS/mountain_wave/` | 5 hours | ~577 m, 70 levels |
 | Baroclinic wave | `~/Data/CheMPAS/jw_baroclinic_wave/` | 16 days | 120 km, 26 levels |
+| Chapman + NOx (global) | `~/Data/CheMPAS/chapman_nox_global/` | 24 hours | 120 km, 40,962 cells, 26 levels (reuses JW init) |
 
 Reference namelists and streams files are tracked in `test_cases/` in the repo.
 See `RUN.md` for execution instructions and `test_cases/README.md` for data
