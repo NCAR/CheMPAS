@@ -3,7 +3,7 @@
 This note describes CheMPAS-A's lightning-NOx (LNOx) source scheme as
 it currently stands in `src/core_atmosphere/chemistry/mpas_lightning_nox.F`.
 It supersedes the historical `LNOx.md` note at the repository root,
-which is preserved as a stub pointing here.
+which is preserved there as the original DC3 motivation record.
 
 For the implementation history of the most recent change (the
 isotherm-mode gating branch) see
@@ -53,7 +53,7 @@ shown match `src/core_atmosphere/Registry.xml`.
 
 | Option | Type | Default | Used in | Description |
 |---|---|---|---|---|
-| `config_lnox_gating_mode` | character | `'altitude'` | both | Selects the gate; `'altitude'` or `'isotherm'`. Unknown values disable the source and log a critical message. |
+| `config_lnox_gating_mode` | character | `'altitude'` | both | Selects the gate; `'altitude'` or `'isotherm'`. Unknown values disable the source and emit a log message. |
 | `config_lnox_source_rate` | real | `0.0` | both | Source rate amplitude; ppbv s⁻¹. Zero disables the source. Altitude mode multiplies by `(w − w_threshold) / w_ref`; isotherm mode applies it as a constant. |
 | `config_lnox_w_threshold` | real | `5.0` | both | Updraft threshold (m s⁻¹) below which no NO is injected. |
 | `config_lnox_w_ref` | real | `10.0` | altitude only | Reference updraft (m s⁻¹) for the altitude-mode rate normalization. Ignored in isotherm mode. |
@@ -105,10 +105,10 @@ Refinement is a manual retune-and-rerun loop: visualize with
 `scripts/plot_lnox_o3.py`, inspect peak NOx in the convective core,
 adjust `config_lnox_source_rate` by a small factor, and re-run.
 
-For altitude mode, the DAVINCI-era default
-`source_rate = 0.5, w_threshold = 5.0, w_ref = 10.0` produces a
-visually similar enhancement on the supercell case; calibration there
-is also a manual loop.
+For altitude mode, the DAVINCI-era working value `source_rate = 0.5`
+(paired with the Registry defaults `w_threshold = 5.0`, `w_ref = 10.0`)
+produces a visually similar enhancement on the supercell case;
+calibration there is also a manual loop.
 
 A regression-suite reference for both modes is planned but not yet
 present in this branch — see
@@ -116,7 +116,7 @@ present in this branch — see
 
 ## See also
 
-- [`LNOx.md`](https://github.com/NCAR/CheMPAS-A/blob/develop/LNOx.md) — original DC3 motivation note (preserved as a pointer)
+- [`LNOx.md`](https://github.com/NCAR/CheMPAS-A/blob/develop/LNOx.md) — original DC3 motivation note
 - [docs/superpowers/specs/2026-05-06-lnox-isotherm-source-design.md](https://github.com/NCAR/CheMPAS-A/blob/develop/docs/superpowers/specs/2026-05-06-lnox-isotherm-source-design.md) — design of the isotherm-mode branch
 - [docs/tutorial/02-supercell.md](https://github.com/NCAR/CheMPAS-A/blob/develop/docs/tutorial/02-supercell.md) — Chapter 2 §2.6 worked examples for both modes
 - [docs/chempas/musica/MUSICA_INTEGRATION.md](https://github.com/NCAR/CheMPAS-A/blob/develop/docs/chempas/musica/MUSICA_INTEGRATION.md) — MUSICA / MICM coupling
